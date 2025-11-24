@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        ul, li, ol{
+            list-style: none;
+        }
+
+        a{
+            text-decoration: none;
+            color: black;
+        }
+        
+        main{
+            width: 1000px;
+            margin: 0 auto;
+            height: 100vh;
+            position: relative;
+            padding-top: 60px;
+        }
+        #navigater{
+            width: 1000px;
+            height: 60px;
+            margin: 0 auto;
+            position: fixed;
+            top: 0;
+        }
+
+        #navigater>ul{
+            display: flex;
+            height: 100%;
+            gap: 12px;
+        }
+
+        #navigater .menu-item{
+            width: max-content;
+            height: 100%;
+            width: 100px;
+        }
+
+        #navigater .menu-item a{
+            width: max-content;
+            height: 100%;
+            display: block;
+            font-size: 18px;
+            font-weight: 800;
+            text-align: left;
+            line-height: 60px;
+        }
+
+        #navigater .menu-item a:hover{
+            scale: 1.08;
+        }
+
+        .menu-item{
+            position: relative;
+        }
+
+        .menu-item ul{
+            display: none;
+            position: absolute;
+            border: 1px solid rgb(51, 51, 51);
+            padding: 12px;
+            border-radius: 12px;
+        }
+
+        .menu-item>a:hover+ul{
+            display: block;
+        }
+
+        .menu-item>ul:hover{
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <div id="navigater">
+            <ul>
+                <li class="menu-item"><a href="">SQL</a></li>
+                <li class="menu-item"><a href="">Java</a></li>
+                <li class="menu-item">
+                    <a href="">Front</a>
+                    <ul>
+                        <li><a href="">HTML</a></li>
+                        <li><a href="">CSS</a></li>
+                        <li><a href="">JavaScript</a></li>
+                        <li><a href="">jQuery</a></li>
+                    </ul>
+                </li>
+                <li class="menu-item"><a href="">Server</a></li>
+                <li class="menu-item"><a href="">Framwork</a></li>
+                <li class="menu-item"><a href="">AWS</a></li>
+            </ul>
+        </div>
+    </main>
+</body>
+</html>

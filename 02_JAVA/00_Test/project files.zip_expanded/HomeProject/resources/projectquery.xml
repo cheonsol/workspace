@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<entry key="insertMember">
+		INSERT INTO MEMBER
+			VALUES(MEMBER_SEQ_NO.NEXTVAL,?, ?, ?)
+	</entry>
+	
+	<entry key="updateMember">
+		UPDATE MEMBER
+			SET USER_NAME=?,
+				USER_AGE=?
+			WHERE USER_ID=?	
+	</entry>
+	
+	<entry key="deleteMember">
+		DELETE FROM MEMBER
+			WHERE USER_ID=?
+	</entry>
+	
+	<entry key="searchMember">
+		SELECT * FROM MEMBER
+			WHERE USER_NAME=?
+	</entry>
+	
+	<entry key="insertMovie">
+		INSERT INTO MOVIE
+			VALUES(MOVIE_SEQ_NO.NEXTVAL,?, ?, ?)
+	</entry>
+	
+	<entry key="updateMovie">
+		UPDATE MOVIE
+			SET MOVIE_GENRE=?,
+				MOVIE_AGE=?
+			WHERE MOVIE_NAME=?
+	</entry>
+	
+	<entry key="deleteMovie">
+		DELETE FROM MOVIE
+			WHERE MOVIE_NAME=?
+	</entry>
+	
+	<entry key="searchMovie">
+		SELECT * FROM MOVIE
+			WHERE MOVIE_NAME LIKE '%' || ? ||'%'
+	</entry>
+	
+	<entry key="selectMovieList">
+		SELECT * FROM MOVIE
+	</entry>
+	
+	<entry key="insertRate">
+		INSERT INTO RATE
+			VALUES(RATE_SEQ_NO.NEXTVAL, ?, ?, ?, ?)
+	</entry>
+	
+	<entry key="selectRateList">
+		SELECT * FROM RATE
+	</entry>
+	
+	<entry key="updateRate">
+		UPDATE RATE
+		SET RATE_MOVIE_SCORE=?,
+			RATE_MOVIE_COMMENT=?
+		WHERE RATE_USER_ID=? AND RATE_MOVIE_NAME=?
+	</entry>
+	
+	<entry key="deleteRate">
+		DELETE FROM RATE
+		WHERE RATE_USER_ID = ? AND RATE_MOVIE_NAME = ?
+	</entry>
+	
+	<entry key="rateSearch">
+		SELECT * 
+		FROM RATE 
+		WHERE RATE_MOVIE_NAME LIKE '%' || ? || '%'
+		</entry>
+</properties> 

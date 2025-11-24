@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<entry key="selectLogMember">SELECT * FROM MEMBER WHERE ID = ? AND USER_PASS = ?</entry>
+<entry key="updateJoinMember">UPDATE MEMBER SET ID = ?,USER_PASS=?, ADDRESS=?, PHONE=?, DRIVE_CAREER=?, USER_CAR=?,ACCIDENT_COUNT=? WHERE USER_ID = ? </entry>
+<entry key="insertCar">INSERT INTO CAR VALUES(?, ?)</entry>
+<entry key="selectAccidentWeightById">SELECT * FROM ACCIDENT_WEIGHT WHERE COMPANY_ID =? AND USER_CAR = ? AND ACCIDENT_COUNT =? </entry>
+<entry key="updateMember">UPDATE MEMBER SET USER_PASS=? ADDRESS=?, PHONE=?, DRIVE_CAREER=?, USER_CAR=?,ACCIDENT_COUNT=? WHERE USER_ID=?</entry>
+<entry key="selectDriveWeightList">SELECT * FROM DRIVE_WEIGHT</entry>
+<entry key="selectDriveWeightById">SELECT * FROM DRIVE_WEIGHT WHERE COMPANY_ID =? AND USER_CAR = ? AND DRIVE_CAREER =? </entry>
+<entry key="updateAccidentWeight">UPDATE ACCIDENT_WEIGHT SET ACCIDENT_MIN=? , ACCIDENT_MAX=? , AW_WEIGHT_SCORE=?  WHERE AW_ID=?</entry>
+<entry key="insertMember">INSERT INTO MEMBER VALUES(MEMBER_SEQ.NEXTVAL,?,? ,?, ?, ?, ?, ?, ?,?, SYSDATE, ?)</entry>
+<entry key="insertCompany">INSERT INTO COMPANY VALUES(COMPANY_SEQ.NEXTVAL, ?, ?, ?)</entry>
+<entry key="selectCarList">SELECT * FROM CAR</entry>
+<entry key="selectMemberById">SELECT * FROM MEMBER WHERE ID = ? AND USER_PASS = ?</entry>
+<entry key="selectCompanyList">SELECT * FROM COMPANY</entry>
+<entry key="selectAccidentWeightList">SELECT * FROM ACCIDENT_WEIGHT</entry>
+<entry key="deleteJoinMember">DELETE FROM MEMBER WHERE ID=? AND USER_PASS=?</entry>
+<entry key="insertDriveWeight">INSERT INTO DRIVE_WEIGHT VALUES(?, ?, ?, ?, ?, ?)</entry>
+<entry key="selectCompanyById">SELECT * FROM COMPANY WHERE COMPANY_ID = ?</entry>
+<entry key="deleteMember">DELETE FROM MEMBER WHERE ID=? AND USER_PASS = ? AND CANCEL_DATE IS NOT NULL</entry>
+<entry key="insertAccidentWeight">INSERT INTO ACCIDENT_WEIGHT VALUES(?, ?, ?, ?, ?, ?)</entry>
+<entry key="selectCompanyIdByName">SELECT * FROM COMPANY WHERE COMPANY_NAME = ?</entry>
+<entry key="selectMemberList">SELECT * FROM MEMBER</entry>
+<entry key="selectRestFee">SELECT REST_FEE FROM AMOUNT WHERE USER_ID = ?</entry>
+<entry key="selectCount">SELECT FAIL_COUNT FROM AMOUNT WHERE USER_ID = ?</entry>
+<entry key="selectPayFee">SELECT PAY_FEE  FROM AMOUNT WHERE USER_ID = ?</entry>
+<entry key="selectInputFee">SELECT INPUT_FEE FROM AMOUNT WHERE USER_ID = ?</entry>
+<entry key="insertAmount">INSERT INTO AMOUNT VALUES(AMOUNT_SEQ.NEXTVAL, ?,?,?,?,?,?)</entry>
+<entry key="updateFee">UPDATE AMOUNT SET INPUT_FEE = INPUT_FEE+? WHERE USER_ID = ?</entry>
+<entry key="updateRestFee">UPDATE AMOUNT SET REST_FEE = ? WHERE USER_ID = ?</entry>
+<entry key="updateCount">UPDATE AMOUNT SET FAIL_COUNT = ? WHERE USER_ID = ?</entry>
+<entry key="updateStatus">UPDATE AMOUNT SET STATUS = 'Y' WHERE USER_ID = ?</entry>
+<entry key="updateFixAmount">UPDATE AMOUNT SET INPUT_FEE = ? WHERE USER_ID = ?</entry>
+<entry key="existAmount">SELECT COUNT(*) FROM AMOUNT WHERE USER_ID = ?</entry>
+<entry key="selectDriveWeight">SELECT DW_WEIGHT_SCORE FROM DRIVE_WEIGHT WHERE COMPANY_ID =? AND CAR_ID =? AND EXPERIENCE_MIN &lt;= ? AND EXPERIENCE_MAX &gt;=? </entry>
+<entry key="selectAccidentWeight">SELECT AW_WEIGHT_SCORE FROM ACCIDENT_WEIGHT WHERE COMPANY_ID =? AND CAR_ID =? AND ACCDIENT_MIN &lt;= ? AND ACCDIENT_MAX &gt;=? </entry>
+</properties>

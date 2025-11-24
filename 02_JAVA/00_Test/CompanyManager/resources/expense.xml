@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<!-- 자금 조회 -->
+	<entry key="selectExp">
+		SELECT EXPENSE FROM T_BUY_EXP_MAN
+		WHERE EXPENSE_NO = (SELECT MAX(EXPENSE_NO) 
+							FROM T_BUY_EXP_MAN)
+	</entry>
+	<!-- 입금 -->
+	<entry key="insertExp">
+		INSERT INTO T_BUY_EXP_MAN (
+			EXPENSE_NO,
+			DEPOSIT,
+			EXPENSE
+		) VALUES (
+			SEQ_EXPEQ.NEXTVAL,
+			?,
+			(SELECT EXPENSE FROM T_BUY_EXP_MAN
+			WHERE EXPENSE_NO = (SELECT MAX(EXPENSE_NO) 
+								FROM T_BUY_EXP_MAN)) + ?
+		)
+	</entry>
+</properties>

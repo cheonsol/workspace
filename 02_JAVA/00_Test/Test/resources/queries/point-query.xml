@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+  <entry key="insertPointHistory">
+    INSERT INTO POINT_HISTORY(PH_ID, USERNO, ORDER_ID, POINT_DIFF, REG_DATE, MEMO)
+    VALUES(?, ?, ?, ?, SYSDATE, ?)
+  </entry>
+
+  <entry key="selectPointHistoryByUser">
+    SELECT PH_ID, USERNO, ORDER_ID, POINT_DIFF, REG_DATE, MEMO
+    FROM POINT_HISTORY
+    WHERE USERNO = ?
+    ORDER BY PH_ID DESC
+  </entry>
+
+  <entry key="updateMemberPoint">
+    UPDATE MEMBER SET POINT_BALANCE = POINT_BALANCE + ? WHERE USERNO = ?
+  </entry>
+</properties>

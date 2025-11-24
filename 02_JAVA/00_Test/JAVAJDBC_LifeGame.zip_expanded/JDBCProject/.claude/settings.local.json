@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(/C:\\workspace\\02_JAVA\\00_Test\\JAVAJDBC_LifeGame.zip_expanded\\JDBCProject\\resources/**)",
+      "Read(/C:\\workspace\\02_JAVA\\00_Test\\JAVAJDBC_LifeGame.zip_expanded\\JDBCProject\\resources/**)",
+      "Read(/C:\\workspace\\02_JAVA\\00_Test\\JAVAJDBC_LifeGame.zip_expanded\\JDBCProject\\resources/**)",
+      "Read(/C:\\workspace\\02_JAVA\\00_Test\\JAVAJDBC_LifeGame.zip_expanded\\JDBCProject\\src\\com\\project\\lifegame\\common/**)",
+      "Read(/C:\\workspace\\02_JAVA\\00_Test\\JAVAJDBC_LifeGame.zip_expanded\\JDBCProject\\src\\com\\project\\lifegame\\controller/**)",
+      "Read(/C:\\workspace\\02_JAVA\\00_Test\\JAVAJDBC_LifeGame.zip_expanded\\JDBCProject\\src\\com\\project\\lifegame\\model\\dao/**)",
+      "Read(/C:\\workspace\\02_JAVA\\00_Test\\JAVAJDBC_LifeGame.zip_expanded\\JDBCProject\\src\\com\\project\\lifegame\\service/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

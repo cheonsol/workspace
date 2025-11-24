@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script
+    src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+    crossorigin="anonymous"></script>
+
+
+    <style>
+        .area{
+            border: 1px solid red;
+            min-height: 200px;
+        }
+    </style>
+</head>
+<body>
+  <form action="">
+    <fieldset>
+        <legend>취미</legend>
+        <table>
+            <tr>
+                <td>
+                    <label>
+                        <input type="checkbox" id="all-hobby-check" onchange="allCheck(this)">
+                        전체선택
+                    </label>
+                </td>
+                <td>
+                    <label>
+                        <input type="checkbox" name="hobby" value="종합">
+                        종합
+                    </label>
+                </td>
+                <td>
+                      <label>
+                        <input type="checkbox" name="hobby" value="소설" >
+                        소설
+                    </label>
+                </td>
+                <td>
+                      <label>
+                        <input type="checkbox" name="hobby" value="시/에세이">
+                        시/에세이
+                    </label>
+                </td>
+                <td>
+                      <label>
+                        <input type="checkbox" name="hobby" value="경영/경제">
+                        경영/경제
+                    </label>
+                </td>
+                <td>
+                        <label>
+                        <input type="checkbox" name="hobby" value="자기계발">
+                        자기계발
+                    </label>
+                </td>
+                <td>
+                    <label>
+                        <input type="checkbox" name="hobby" value="아동">
+                        아동
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <label>
+                        <input type="checkbox" name="hobby" value="여행">
+                        여행
+                    </label>
+                </td>
+                <td>
+                      <label> 
+                        <input type="checkbox" name="hobby" value="과학">
+                        과학
+                    </label>
+                </td>
+                <td>
+                      <label>
+                        <input type="checkbox" name="hobby" value="역사/문화">
+                        역사/문화
+                    </label>
+                </td>
+                <td>
+                      <label>
+                        <input type="checkbox" name="hobby" value="외국어">
+                        외국어
+                    </label>
+                </td>
+                <td>
+                    <label>
+                        <input type="checkbox" name="hobby" value="컴퓨터">
+                        컴퓨터
+                    </label>
+                </td>
+                <td>
+                    <label>
+                        <input type="checkbox" name="hobby" value="만화">
+                        만화
+                    </label>
+                </td>
+            </tr>
+        </table>
+    </fieldset>
+  </form>  
+
+  <br>
+
+  <button onclick="selectCatrgory()">카테고리 선택</button>
+  <div class="area" id="select-result"></div>
+
+  <script>
+    /*
+    function selectCatrgory(){
+        //하단 네모에 선택한 카테고리(checkbox가 checked인 것) 출력
+        const hobbyCheckBoxList = document.querySelectorAll('input[name=hobby]');
+        console.log(hobbyCheckBoxList);
+
+        let str = "";
+        for(let i=0; i<hobbyCheckBoxList.length; i++){
+            const box = hobbyCheckBoxList[i];
+            if(box.checked) { //체크된 박스인지 검사
+                  str += (box.value + " "); //체크된 박스의 value값을 전부 str에 더함.
+            }
+        }
+
+        const resultEl = document.getElementById('select-result');
+        resultEl.innerText = str;
+    }
+    */
+
+    //jquery에서 배열.each(function(인덱스, 요소){반복할코드})
+   function selectCatrgory(){
+        let str = "";
+        const $checkBoxList = $("input[name=hobby]");
+        $checkBoxList.each(function(idx, el){
+            if(el.checked){
+                str += (el.value + " ");
+            }
+        });
+
+        $('#select-result').text(str);
+
+   }
+
+   /*
+    function allCheck(_allCheckBox){
+        const isChecked = _allCheckBox.checked; //전체선택 체크박스가 true(체크됨), false(체크안됨)에 따라서 나머지 체크박스의 check상태도 변경
+        
+        //모든 체크박스 가져오기
+        const hobbyCheckBoxList = document.querySelectorAll('input[name=hobby]');
+        //모든체크박스를 반복하며
+        for(let i=0; i<hobbyCheckBoxList.length; i++){
+            //체크박스의 check상태를 전체선택 체크박스의 상태와 동일하게 적용
+            hobbyCheckBoxList[i].checked = isChecked;
+        }
+    }
+    */
+
+    function allCheck(_allCheckBox){
+        const isChecked = _allCheckBox.checked;
+        const $checkBoxList = $("input[name=hobby]");
+        $checkBoxList.each(function(idx, el){
+            $(el).attr("checked", isChecked);
+        })
+
+    }
+
+    /*
+    function changeAllCheckBox(){
+        //모든체크박스를 가져와서
+        const hobbyCheckBoxList = document.querySelectorAll('input[name=hobby]');
+
+        //하나라도 체크되지 않은게 있는가?
+        //하나라도 체크되지않았다면 false, 모두체크상태라면 true
+        let isChecked = true;
+        for(let i=0; i<hobbyCheckBoxList.length; i++){
+            if(!hobbyCheckBoxList[i].checked){// 체크박스가 체크되지 않았다면
+                isChecked = false;
+                break;
+            }
+        }
+
+        //체크되지않은 걸 찾지못함 -> isChecked = true;
+        // if(!hobbyCheckBoxList[i].checked)조건에 만족하는 결과값을 찾았다면 -> isChecked = false;
+        const allCheckBox = document.getElementById('all-hobby-check');
+        allCheckBox.checked = isChecked;
+    }
+    */
+
+    function changeAllCheckBox(){
+        const $checkBoxList = $("input[name=hobby]");
+        let isChecked = true;
+        $checkBoxList.each(function(idx, el){
+            if(!el.checked) {
+                isChecked = false;
+                return false; // each() -> break
+            }
+        });
+
+        $("#all-hobby-check").prop('checked', isChecked);
+    }
+
+    /*
+    const hobbyCheckBoxList = document.querySelectorAll('input[name=hobby]');
+    for(let i=0; i<hobbyCheckBoxList.length; i++){
+        hobbyCheckBoxList[i].onchange = changeAllCheckBox;
+    }
+    */
+
+    $('input[name=hobby]').change(changeAllCheckBox);
+    
+  </script>
+</body>
+</html>

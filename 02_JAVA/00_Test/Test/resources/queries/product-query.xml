@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+  <entry key="insertProduct">
+    INSERT INTO PRODUCT(PROD_ID, NAME, CATEGORY, PRICE,
+                        STOCK_QTY, IS_PERISHABLE, EXPIRY_DATE, ON_SALE_YN)
+    VALUES(?, ?, ?, ?, 0, ?, ?, ?)
+  </entry>
+
+  <!-- 부분수정(이름/카테고리/가격/판매여부)을 동적SQL로 조합한다면,
+       XML엔 풀셋 버전도 두고, DAO에서 필요한 컬럼만 set 하도록 해도 OK -->
+  <entry key="updateProductBasic">
+    UPDATE PRODUCT 
+    SET NAME = NVL(?, NAME), 
+        CATEGORY = NVL(?, CATEGORY), 
+        PRICE = NVL(?, PRICE), 
+        ON_SALE_YN = NVL(?, ON_SALE_YN)
+    WHERE PROD_ID = ?
+  </entry>
+
+  <entry key="addStock">
+    UPDATE PRODUCT SET STOCK_QTY = STOCK_QTY + ? WHERE PROD_ID = ?
+  </entry>
+
+  <entry key="minusStockIfEnough">
+    UPDATE PRODUCT SET STOCK_QTY = STOCK_QTY - ?
+    WHERE PROD_ID = ? AND STOCK_QTY >= ?
+  </entry>
+
+  <entry key="selectProductById">
+    SELECT PROD_ID, NAME, CATEGORY, PRICE, STOCK_QTY,
+           IS_PERISHABLE, EXPIRY_DATE, ON_SALE_YN
+    FROM PRODUCT
+    WHERE PROD_ID = ?
+  </entry>
+
+  <entry key="selectProductAll">
+    SELECT PROD_ID, NAME, CATEGORY, PRICE, STOCK_QTY,
+           IS_PERISHABLE, EXPIRY_DATE, ON_SALE_YN
+    FROM PRODUCT
+    ORDER BY PROD_ID
+  </entry>
+
+  <entry key="updateStock">
+    UPDATE PRODUCT SET STOCK_QTY = STOCK_QTY + ? WHERE PROD_ID = ?
+  </entry>
+</properties>

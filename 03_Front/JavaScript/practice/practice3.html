@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            box-sizing: border-box;
+        }
+        input{
+            width: 100px;
+            height: 30px;
+        }
+        select, button{
+            height: 30px;
+        }
+
+        .error-result{
+            color: white;
+            background: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Practice3</h1>
+    <div class="container">
+        <input type="number" id="num1">
+        <select id="calcul-type">
+            <option value="+">+</option>
+            <option value="-">-</option>
+            <option value="*">*</option>
+            <option value="/">/</option>
+            <option value="%">%</option>
+        </select>
+        <input type="number" id="num2">
+        <button onclick="clickResult()">=</button>
+        <input type="text" readonly id="calcul-result">
+    </div>
+    <script>
+        function clickResult(){
+            //input1에 값과 input2의 값을 select기호로 연산하여
+            //결과를 input3에 출력
+            const number1 = Number(document.getElementById('num1').value);
+            const number2 = Number(document.getElementById('num2').value);
+            const resultEl = document.getElementById('calcul-result');
+
+            const typeValue = document.getElementById('calcul-type').value;
+            
+            if(number2 === 0 && (typeValue === '/' || typeValue === '%')){
+                //  resultEl.className = 'error-result';
+                resultEl.classList.add('error-result');
+                 resultEl.value = "연산불가";
+            } else {
+                let result = calculator(number1, number2, typeValue);
+                resultEl.value = result;
+                //resultEl.className = "";
+                resultEl.classList.remove('error-result');
+            }
+        }
+
+        function calculator(number1, number2, typeValue){
+            let result;
+            switch (typeValue) {
+                case '+':
+                    result = number1 + number2;
+                    break;
+                case '-':
+                    result = number1 - number2;
+                    break;
+                case '*':
+                    result = number1 * number2;
+                    break;
+                case '/':
+                    result = number1 / number2;
+                    break;
+                case '%':
+                    result = number1 % number2;
+                    break;
+                default:
+                    break;
+            }
+
+            return result;
+        }
+    </script>
+</body>
+</html>

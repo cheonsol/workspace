@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<entry key="insertRental">
+		INSERT INTO RENTAL
+		VALUES(
+		SEQ_RENNO.NEXTVAL,
+		?,
+		?,
+		SYSDATE,
+		'대여중'
+		)
+	</entry>
+	<entry key="updateReturn">
+		UPDATE RENTAL
+		SET STATUS = '반납완료'
+		WHERE CUST_NO = ? AND
+		DEV_NO = ?
+		AND STATUS = '대여중'
+	</entry>
+</properties>

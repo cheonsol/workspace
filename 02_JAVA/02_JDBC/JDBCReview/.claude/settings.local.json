@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "Bash(dir /s)",
+      "Read(/C:\\workspace\\02_JAVA\\02_JDBC\\JDBCReview\\src\\com\\kh\\jdbc\\model\\run/**)",
+      "Read(/C:\\workspace\\02_JAVA\\02_JDBC\\JDBCReview\\src\\com\\kh\\jdbc\\common/**)",
+      "Read(/C:\\workspace\\02_JAVA\\02_JDBC\\JDBCReview\\src\\com\\kh\\jdbc/**)",
+      "Read(/C:\\workspace\\02_JAVA\\02_JDBC\\JDBCReview\\resources/**)",
+      "Read(/C:\\workspace\\02_JAVA\\02_JDBC\\JDBCReview\\resources/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<entry key="insertMember">
+		INSERT INTO MEMBER 
+		VALUES(
+			SEQ_MEMNO.NEXTVAL, 
+			?, 
+			?, 
+			?, 
+			?, 
+			?, 
+			?
+		)
+	</entry>
+	<entry key="selectMemberAll">SELECT * 
+		FROM MEMBER
+	</entry>
+	<entry key="deleteMember">
+		DELETE FROM MEMBER 
+		WHERE USER_ID = ?
+	</entry>
+	<entry key="updateMember">
+		UPDATE MEMBER 
+		SET USER_NICKNAME = ?, USER_EMAIL = ?
+		WHERE USER_ID =?
+	</entry>
+	<entry key="loginMember">SELECT * 
+		FROM MEMBER 
+		WHERE USER_ID = ? AND USER_PWD = ?</entry>
+</properties>

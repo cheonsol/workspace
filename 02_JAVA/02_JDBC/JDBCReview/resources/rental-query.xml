@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<entry key="insertRental">
+		INSERT INTO RENTAL 
+		VALUES(
+			SEQ_RENTAL_ID.NEXTVAL, 
+			?, 
+			?, 
+			SYSDATE,
+			NULL
+		)
+	</entry>
+	<entry key="updateReturnDate">
+		UPDATE RENTAL
+		SET RETURN_DATE = SYSDATE
+		WHERE MEMBER_ID = ? AND BOOK_ID = ?
+		AND RETURN_DATE IS NULL
+	</entry>
+</properties>

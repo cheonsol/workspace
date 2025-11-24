@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+  <entry key="insertOrder">
+    INSERT INTO ORDERS(ORDER_ID, USERNO, ORDER_DATE, STATUS, TOTAL_AMOUNT)
+    VALUES(?, ?, SYSDATE, ?, ?)
+  </entry>
+
+  <entry key="insertOrderItem">
+    INSERT INTO ORDER_ITEM(ORDER_ITEM_ID, ORDER_ID, PROD_ID, QTY, UNIT_PRICE)
+    VALUES(?, ?, ?, ?, ?)
+  </entry>
+
+  <entry key="selectOrderItemsByOrderId">
+    SELECT ORDER_ITEM_ID, ORDER_ID, PROD_ID, QTY, UNIT_PRICE
+    FROM ORDER_ITEM
+    WHERE ORDER_ID = ?
+  </entry>
+
+  <entry key="updateOrderStatus">
+    UPDATE ORDERS SET STATUS = ? WHERE ORDER_ID = ?
+  </entry>
+
+  <entry key="selectOrderById">
+    SELECT ORDER_ID, USERNO, ORDER_DATE, STATUS, TOTAL_AMOUNT
+    FROM ORDERS
+    WHERE ORDER_ID = ?
+  </entry>
+</properties>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .positioning{border: 1px solid black;}
+        .outer{
+            position: relative;
+            border: 1px solid red;
+        }
+
+        #first{
+            width: 300px;
+            height: 300px;
+            background: yellow;
+        }
+
+        #second{
+            width: 200px;
+            height: 200px;
+            background: teal;
+            position: absolute; /*내가 원하는 위치에 두기(절대값 위치 조정)*/
+            left: 50px;
+            top: 50px;
+        }
+
+        #third{
+            width: 100px;
+            height: 100px;
+            background: red;
+            position: absolute;
+            bottom: 100px;
+            left: 100px;
+        }
+
+        #fixed-area{
+            width: 70px;
+            height: 70px;
+            background: #fa8400;
+            font-size: 24px;
+            font-weight: 700;
+            color: rgb(243, 243, 243);
+            border: none;
+            text-align: center;
+            line-height: 70px;
+            border-radius: 50px;
+            position: fixed; /*브라우저 기준 고정값*/
+            right: 20px;
+            bottom: 20px;
+        }
+
+        .float-test{
+            border: 1px solid black;
+            width: 70px;
+            height: 30px;
+            float: left;
+        }
+
+        .clearfloat{
+            clear: both;
+            clear: left;
+            clear: right;
+        }
+    </style>
+</head>
+<body>
+    <h1>배치관련 스타일</h1>
+    <h3>position: 상대위치(relative)와 절대위치(absolute)</h3>
+
+    <div class="outer">
+        <div class="positioning" id="first">첫번째 자식요소</div>
+        <div class="positioning" id="second">두번째 자식요소</div>
+        <div class="positioning" id="third">세번째 자식요소</div>
+    </div>
+
+    <h3>position : relative</h3>
+    <p>
+        요소를 기본위치에 상대적으로 이동. <br>
+        이동 후에도 원래 자리공간은 그대로 차지함. <br>
+        주로 자식 absolute요소의 기준점을 만들기위해 사용
+    </p>
+
+    <hr>
+
+    <h3>position : absolute</h3>
+    <p>
+        요소를 가장 가까운 position지정 조상요소(relative, absolute, fixed, sticky...)기준으로 위치 <br>
+        지정된 조상이 없다면 <html>기준으로 위치 <br>
+        자신이 차지하던 공간을 무시하고 레이아웃에서 빠짐
+    </p>
+
+    <hr>
+
+    <h3>position : 고정위치(fixed)</h3>
+    <p>
+        브라우저 뷰포트(화면)을 기준으로 위치가 고정됨. <br>
+        스크롤시에도 항상 같은 위치값을 가짐. <br>
+        레이아웃에서 제외(absolute와 동일하게 원래 공간 차지x)
+    </p>
+    <div class="positioning" id="fixed-area">문의</div>
+
+    <h3>float</h3>
+    <p>
+        이미지 주변에 텍스트를 감싸기위해서 만들어진 속성 <br>
+        요소를 왼쪽 또는 오른쪽으로 띄워서 배치 <br>
+        뒤에오는 컨텐츠는 띄워진 요소를 피해 흐름을 따라서 배치
+    </p>
+
+    <div class="float-test">요소1</div>
+    <div class="float-test">요소2</div>
+    <div class="float-test">요소3</div>
+    <div class="float-test">요소4</div>
+    <div class="float-test">요소5</div>
+
+    <br clear="both">
+
+    <hr>
+</body>
+</html>

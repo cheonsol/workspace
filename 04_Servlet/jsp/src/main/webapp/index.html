@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<h1>JSP</h1>
+    <p>
+        HTML 문서 안에서 JAVA코드를 직접 작성할 수 있는 기술 <br>
+        - Servlet에서 응답화면(HTML)을 만드는 복잡한 과정을 단순화. <br>
+        - 비즈니스 로직은 Servlet에서, 화면(View)는 JSP에서 담당 -> 역할분리(MVC패턴의 기초) <br>
+        - 내부적으로는 JSP -> Servlet으로 변환 후 동작 <br>
+        - 내장 객체 제공 : request(요청정보를 저장해둔 객체), response(응답에 필요한 정보를 저장해둔 객체), session(브라우저 별로만들어 둔 서버 저장소)등...
+    </p>
+
+    <h2>JSP 요소(Element)표현법</h2>
+    
+    <h3>JSP스크립트 원소</h3>
+    <p>JSP페지에서 자바코드를 기술할 수 있는 기능</p>
+
+    <ol>
+        <li>
+            스크립틀릿 : <% 자바코드 %> <br>
+            JSP에서 자바코드 기술하기위한 가장 기본적인 방법
+        </li>
+        <li>
+            표현식(출력식) : <%= 변수 %> <br>
+            자바에 저장되어있는 값을 화면상에 출력하기위한 방법
+        </li>
+    </ol>
+
+    <a href="views/01_scripting_element.jsp">view detail</a>
+    
+    <h3>JSP 지시어 <%@ page | include | taglib  속성=값 속성=값... %> </h3>
+    
+    <p>
+    	JSP페이지 전체에 영향을 주는 속성, 설정을 선언할 때 사용.
+    </p>
+    
+    <ol>
+    	<li>
+    		page지시어 : JSP페이지 처리에 필요한 속성을 지정하는데 사용.
+    		<ul>
+    			<li>language : jsp페이지에서 사용할 언어 지정</li>
+    			<li>contentType : 해당 페이지의 형식, 문자셋을 지정</li>
+    			<li>pageEncoding : JSP페이지 내에 기록된 자바코드의 인코딩 방식</li>
+    			<li>import : 자바의 import와 동일하게 외부 라이브러리를 불러올 때 사용</li>
+    			<li>errorPage : 해당 jsp상에 오류가 발생했을 경우 보여줄 임사 페이지의 경로를 기술</li>
+    		</ul>
+    	</li>
+    	<li>
+    		include 지시어 : 현재 jsp상에 또다른 jsp를 포함시켜 사용할 수 있는 지시어.
+    	</li>
+    	<li>
+    		taglib 지시어 : jsp기능을 좀 더 확장시킬 수 있는 추가적인 라이브러리를 등록하는 지시어.
+    	</li>
+    </ol>
+    
+    <a href="views/02_directive.jsp">view detail</a>
+    
+    <h2>피자주문 페이지(jsp) --> 주문요청 --> 주문요청처리(servlet) --> 피자결제페이지(응답 jsp)</h2>
+    <a href="views/pizza/pizzaOrderForm.jsp">피자주문페이지</a>
+    
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+

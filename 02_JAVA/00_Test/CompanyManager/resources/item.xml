@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<!-- 비품 조회 -->
+	<entry key ="selectItem">
+		SELECT ITEM_CODE,
+				ITEM_NAME,
+				ITEM_PRICE,
+				ITEM_CNT,
+				ITEM_REQ_ID
+		FROM T_ITEM
+		WHERE ITEM_NAME LIKE '%'||?||'%'
+	</entry>
+	<!-- 비품 정보 등록 -->
+	<entry key="insertItem">
+		INSERT INTO T_ITEM
+		VALUES(
+			SEQ_ITEMEQ.NEXTVAL,
+			?,
+			?,
+			?,
+			0,
+			?
+		)
+	</entry>
+	<!-- 발주 요청 -->
+	<entry key="orderReq">
+		INSERT INTO T_ITEM_ORDER(
+			ORDER_NO,
+			ITEM_CODE,
+			ORDER_CNT,
+			ORDER_STATE,
+			REQ_DATE,
+			ORDER_REQ_ID
+		) VALUES (
+			SEQ_ORDEQ.NEXTVAL,
+			?,
+			?,
+			'R', -- 요청중
+			SYSDATE,
+			?	
+		)
+	</entry>
+	<!-- 발주 요청 처리 -->
+	<entry key="orderReqRespone">
+		UPDATE T_ITEM_ORDER
+		SET
+			ORDER_STATE = ?,
+			ORDER_CANCEL_REASON = ?,
+			ORDER_RES_ID = ?
+		WHERE ORDER_NO = ?
+	</entry>
+	<!-- 물품 입고 -->
+	<entry key="inputItem">
+		INSERT INTO T_ITEM_INPUT
+		VALUES (
+			SEQ_INEQ.NEXTVAL,
+			?,
+			SYSDATE,
+			?,
+			?
+		)
+	</entry>
+	<!-- 비품 사용 신청 -->
+	<entry key="useReq">
+		INSERT INTO T_ITEM_USE(
+			REQ_NO,
+			ITEM_CODE,
+			REQ_CNT,
+			REQ_STATE,
+			REQ_DATE,
+			REQ_ID
+		) VALUES (
+			SEQ_REQEQ.NEXTVAL,
+			?,
+			?,
+			'R', -- 요청중
+			SYSDATE,
+			?
+		)
+	</entry>
+	<!-- 비품 사용 요청 처리 -->
+	<entry key="useReqRespone">
+		UPDATE T_ITEM_USE
+		SET
+			REQ_STATE = ?,
+			REQ_CANCEL_REASON = ?,
+			RES_ID = ?
+		WHERE REQ_NO = ?
+	</entry>
+	<!-- 비품 출고 -->
+	<entry key="outputItem">
+		INSERT INTO T_ITEM_OUTPUT
+		VALUES (
+				SEQ_OUTEQ.NEXTVAL,
+				?,
+				SYSDATE,
+				?,
+				?
+		)
+	</entry>
+	<!-- 발주 요청 조회 -->
+	<entry key="selectOrderList">
+		SELECT A.ORDER_NO,
+				A.ITEM_CODE,
+                B.ITEM_NAME,
+				A.ORDER_CNT,
+				CASE WHEN A.ORDER_STATE = 'R' THEN '요청'
+                WHEN A.ORDER_STATE = 'O' THEN '승인'
+                WHEN A.ORDER_STATE = 'C' THEN '완료'
+                ELSE '반려' END AS ORDER_STATE,
+				A.REQ_DATE,
+				A.ORDER_CANCEL_REASON,
+				A.ORDER_REQ_ID,
+				A.ORDER_RES_ID
+		FROM T_ITEM_ORDER A
+        LEFT OUTER JOIN T_ITEM B
+        ON A.ITEM_CODE = B.ITEM_CODE
+		WHERE 1=1
+		AND A.ITEM_CODE LIKE '%'||?||'%'
+		AND A.ORDER_STATE LIKE '%'||?||'%'
+	</entry>
+	<!-- 사용 요청 조회 -->
+	<entry key="selectUseList">
+		SELECT A.REQ_NO,
+				A.ITEM_CODE,
+				B.ITEM_NAME,
+				A.REQ_CNT,
+				CASE WHEN A.REQ_STATE = 'R' THEN '요청'
+                WHEN A.REQ_STATE = 'O' THEN '승인'
+                WHEN A.REQ_STATE = 'C' THEN '완료'
+                ELSE '반려' END AS REQ_STATE,
+				A.REQ_DATE,
+				A.REQ_CANCEL_REASON,
+				A.REQ_ID,
+				A.RES_ID
+		FROM T_ITEM_USE A
+        LEFT OUTER JOIN T_ITEM B
+        ON A.ITEM_CODE = B. ITEM_CODE
+		WHERE 1=1
+		AND A.ITEM_CODE LIKE '%'||?||'%'
+		AND A.REQ_STATE LIKE '%'||?||'%'
+	</entry>
+</properties>

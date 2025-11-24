@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<!-- 회원가입 -->
+	<entry key ="signEmp">
+		INSERT INTO T_EMP
+			VALUES(
+				SEQ_EMPEQ.NEXTVAL, --사원 번호
+				?, -- 사원 아이디
+				?, -- 비밀번호
+				(SELECT DEPT_CODE FROM T_DEPT WHERE DEPT_NAME = ?), -- 부서
+				(SELECT JOB_CODE FROM T_JOB WHERE JOB_NAME = ?), -- 직급
+				?, -- 연봉
+				SYSDATE, -- 입사일
+				?, -- 생일
+				? -- 사원 명
+			)
+	</entry>
+	<!-- 회원가입시 입력한 부서명이 존재하는지 체크 -->
+	<entry key="checkDept">
+		SELECT COUNT(*) AS CNT FROM T_DEPT
+		WHERE DEPT_NAME = ?
+	</entry>
+	<!-- 회원가입시 입력한 직급명이 존재하는지 체크 -->
+	<entry key="checkJob">
+		SELECT COUNT(*) AS CNT FROM T_JOB
+		WHERE JOB_NAME = ?
+	</entry>
+	<!-- 회원가입시 입력한 부서 내 직원수 증가 -->
+	<entry key="updateDeptCnt">
+		UPDATE T_DEPT
+		SET
+			DEPT_EMP_CNT = DEPT_EMP_CNT + 1
+		WHERE DEPT_NAME = ?
+	</entry>
+	<!-- 회원가입시 입력한 직급의 사원수 증가 -->
+	<entry key="updateJobCnt">
+		UPDATE T_JOB
+		SET
+			JOB_EMP_CNT = JOB_EMP_CNT + 1
+		WHERE JOB_NAME = ?
+	</entry>
+	<!-- 회원 정보 수정시 이전 부서 사원수 차감 -->
+	<entry key="updateOldDeptCnt">
+		UPDATE T_DEPT
+		SET
+			DEPT_EMP_CNT = DEPT_EMP_CNT - 1
+		WHERE DEPT_CODE = ?
+	</entry>
+	<!-- 회원정보 수정시 이전 직급 사원수 차감 -->
+	<entry key="updateOldJobCnt">
+		UPDATE T_JOB
+		SET
+			JOB_EMP_CNT = JOB_EMP_CNT - 1
+		WHERE JOB_CODE = ?
+	</entry>
+	
+	<!-- 로그인시도 아이디 비밀번호 확인 -->
+	<entry key="loginEmp">
+		SELECT *
+		FROM T_EMP
+		WHERE EMP_ID = ?
+		AND EMP_PWD = ?
+	</entry>
+	<!-- 회원 조회 -->
+	<entry key="selectEmpList">
+		SELECT EMP_ID,
+				EMP_NAME,
+				EMP_DEPT,
+				EMP_JOB,
+				SALARY,
+				HIRE_DATE,
+				BIRT_DATE
+		FROM T_EMP
+		WHERE 1=1
+		AND EMP_NAME LIKE '%'||?||'%'
+		AND EMP_ID LIKE '%'||?||'%'
+		AND EMP_DEPT IN (SELECT DEPT_CODE FROM T_DEPT WHERE DEPT_NAME LIKE '%'||?||'%' )
+		AND EMP_JOB IN (SELECT JOB_CODE FROM T_JOB WHERE JOB_NAME LIKE '%'||?||'%')
+	</entry>
+	<!-- 수정할 회원 정보 조회 -->
+	<entry key="selectUpdateEmp">
+		SELECT EMP_NO,
+				EMP_ID,
+				EMP_NAME,
+				EMP_DEPT,
+				EMP_JOB,
+				SALARY,
+				HIRE_DATE,
+				BIRT_DATE
+		FROM T_EMP
+		WHERE EMP_ID = ?
+	</entry>
+	
+	<!-- 회원 정보 수정 -->
+	<entry key="updateEmp">
+		UPDATE T_EMP
+		SET
+			EMP_DEPT = (SELECT DEPT_CODE FROM T_DEPT WHERE DEPT_NAME = ?),
+			EMP_JOB = (SELECT JOB_CODE FROM T_JOB WHERE JOB_NAME = ?),
+			SALARY = ?
+		WHERE EMP_ID = ?
+	</entry>
+	<!-- 회원 탈퇴 -->
+	<entry key="deleteEmp">
+		DELETE FROM T_EMP
+		WHERE EMP_ID = ?
+	</entry>
+	<!-- 탈퇴 회원 정보 임시 저장 -->
+	<entry key="insertDelEmp">
+		INSERT INTO T_DEL_EMP
+		VALUES (
+			?,
+			?,
+			?,
+			?,
+			SYSDATE,
+			?,
+			?
+		)
+	</entry>
+</properties>

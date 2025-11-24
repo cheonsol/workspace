@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+  <entry key="selectMemberByPhone">
+    SELECT USERNO, NAME, PHONE, POINT_BALANCE, JOIN_DATE
+    FROM MEMBER
+    WHERE PHONE = ?
+  </entry>
+
+  <entry key="insertMember">
+    INSERT INTO MEMBER(USERNO, NAME, PHONE, POINT_BALANCE, JOIN_DATE)
+    VALUES(?, ?, ?, 0, SYSDATE)
+  </entry>
+
+  <entry key="updatePointBalance">
+    UPDATE MEMBER
+    SET POINT_BALANCE = POINT_BALANCE + ?
+    WHERE USERNO = ?
+  </entry>
+
+  <entry key="getPointBalance">
+    SELECT POINT_BALANCE FROM MEMBER WHERE USERNO = ?
+  </entry>
+</properties>

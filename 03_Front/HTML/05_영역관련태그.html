@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>영역관련태그</title>
+    <style>
+        div{
+            width: 200px;
+            height: 200px;
+            border: 1px solid black;
+        }
+        span{
+            width: 200px;
+            height: 200px;
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <!--
+        블럭요소 : 한줄 단위로 영역을 차지함.
+                  줄바꿈이 적용되어 이미 존재하는 태그의 다음줄에 다음영역이 잡힘.
+                  (p, pre, div, h...)
+        인라인요소 : content(내용) 영역에 해당하는 부분만 영역을 차지하는 요소
+                    줄바꿈이 적용되지않아 다음영역이 바로 옆으로 잡힘
+                    (b, mark, s, img, span...)
+    -->
+    <h1>영역관련태그</h1>
+    <h2>div태그와 span태그의 차이점1 : 줄바꿈처리</h2>
+
+    <div style="background: red;">첫번째 영역</div>
+    <div style="background: orange;">두번째 영역</div>
+    <div style="background: yellow;">세번째 영역</div>
+
+    <h3>span태그</h3>
+    <p>span태그는 인라인 요소로 content영역만 차지(줄바꿈 발생x)</p>
+    <span style="background: red;">첫번째 영역</span>
+    <span style="background: orange;">두번째 영역</span>
+    <span style="background: yellow;">세번째 영역</span>
+
+    <h2>div태그와 span태그의 차이점2 : 영역지정방식</h2>
+    <h3>div태그 : 사각형 박스로 영역을 지정.</h3>
+    <div style="height: auto;">
+        [파이낸셜뉴스] 베스핀글로벌은 ‘스노우플레이크 월드 투어 서울 2025’ 행사에 블랙 다이아몬드 스폰서로 참여해 성공적으로 행사를 마쳤다고 10일 밝혔다.
+        글로벌 데이터 클라우드 기업 스노우플레이크가 주관한 이번 행사에서 베스핀글로벌은 자사 데이터·AI 전문 역량을 공유하며 스노우플레이크와의 전략적 파트너십을 강화하는 데 초점을 맞췄다.
+        장익철 베스핀글로벌 Data AI 본부장은 발표자로 나서 스노우플레이크를 활용한 데이터 플랫폼 구축 사례와 복잡한 데이터 파이프라인의 기획, 운영, 관리 기능을 자동화하는 에이전틱 AI '헬프나우 오토MSP'를 소개했다.
+    </div>
+    <h3>span태그 : 문장단위로 영역을 지정.</h3>
+    <span style="height: auto;">
+        [파이낸셜뉴스] 베스핀글로벌은 ‘스노우플레이크 월드 투어 서울 2025’ 행사에 블랙 다이아몬드 스폰서로 참여해 성공적으로 행사를 마쳤다고 10일 밝혔다.
+        글로벌 데이터 클라우드 기업 스노우플레이크가 주관한 이번 행사에서 베스핀글로벌은 자사 데이터·AI 전문 역량을 공유하며 스노우플레이크와의 전략적 파트너십을 강화하는 데 초점을 맞췄다.
+        장익철 베스핀글로벌 Data AI 본부장은 발표자로 나서 스노우플레이크를 활용한 데이터 플랫폼 구축 사례와 복잡한 데이터 파이프라인의 기획, 운영, 관리 기능을 자동화하는 에이전틱 AI '헬프나우 오토MSP'를 소개했다.
+    </span>
+
+    <hr>
+
+    <h1>iframe</h1>
+    <p>웹문서 안에 다른 웹페이지를 추가하는 태그(인라인요소)</p>
+    <iframe src="./04_미디어관련태그.html" frameborder="0" width="300" height="300"></iframe>
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/PbLxIaXRtnc?si=c0Vzqc9b5Hfqx2jt" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</body>
+</html>

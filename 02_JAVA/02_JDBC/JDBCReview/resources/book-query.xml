@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<entry key="insertBook">
+		INSERT INTO Book 
+		VALUES(
+			SEQ_BOOK_ID.NEXTVAL, 
+			?, 
+			?, 
+			?
+		)
+	</entry>
+	<entry key="selectAllBooks">
+		SELECT * FROM BOOK ORDER BY BOOK_ID
+	</entry>
+	<entry key="selectAllBooksWithRentalStatus">
+		SELECT B.BOOK_ID, B.TITLE, B.AUTHOR, B.PUBLISHER,
+        CASE WHEN R.RENTAL_ID IS NOT NULL AND R.RETURN_DATE IS NULL
+            THEN 1 ELSE 0 END AS IS_RENTED
+		FROM BOOK B
+		LEFT JOIN RENTAL R ON B.BOOK_ID = R.BOOK_ID
+		AND R.RETURN_DATE IS NULL
+		ORDER BY B.BOOK_ID
+	</entry>
+	<entry key="updateBook">
+		UPDATE BOOK 
+		SET TITLE=?, 
+			AUTHOR=?, 
+			PUBLISHER=?
+		WHERE BOOK_ID=?
+	</entry>
+	<entry key="deleteBook">
+		DELETE FROM BOOK 
+		WHERE BOOK_ID=?
+	</entry>
+	<entry key="searchBookByTitle">
+		SELECT * 
+		FROM BOOK 
+		WHERE TITLE LIKE '%' || ? || '%'
+		ORDER BY BOOK_ID
+	</entry>
+</properties>

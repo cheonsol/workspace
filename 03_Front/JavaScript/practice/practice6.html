@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .flex-row-center{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gap24{ gap: 24px;}
+
+        .conteiner{
+            background: lightgray;
+            padding: 12px;
+            display: none;
+        }
+
+        .conteiner input[type="text"]{
+            min-width: 400px;
+        }
+
+        .conteiner.block{
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>Practice6</h1>
+    <fieldset>
+        <legend>검색할 항목을 선택하세요.</legend>
+        <div class="flex-row-center gap24">
+            <label>
+                <input type="radio" name="category" onchange="showSearchArea('title-search');"> 제목
+            </label>
+            <label>
+                <input type="radio" name="category" onchange="showSearchArea('date-search');"> 날짜
+            </label>
+            <label>
+                <input type="radio" name="category" onchange="showSearchArea('writer-search');"> 작성자
+            </label>
+        </div>
+    </fieldset>
+    <br>
+
+    <div class="conteiner" id="title-search">
+        <form action="">
+            검색할 제목을 입력하세요 : <br>
+            <input type="text">
+            <input type="submit" value="검색" onclick="return false;">
+        </form>
+    </div>
+
+    <div class="conteiner" id="date-search">
+        <form action="">
+            검색할 날짜를 선택하세요 : <br>
+            <input type="date"> - <input type="date">
+            <input type="submit" value="검색" onclick="return false;">
+        </form>
+    </div>
+
+    <div class="conteiner" id="writer-search">
+        <form action="">
+            검색할 작성자 아이디를 입력하세요 : <br>
+            <input type="text">
+            <input type="submit" value="검색" onclick="return false;">
+        </form>
+    </div>
+
+    <script>
+        function showSearchArea(containerID){
+            const containerList = document.querySelectorAll('.conteiner');
+            for(let i=0; i<containerList.length; i++){
+                containerList[i].classList.remove('block');
+            }
+
+            const container = document.getElementById(containerID)
+            container.classList.add('block');
+        }
+    </script>
+</body>
+</html>
