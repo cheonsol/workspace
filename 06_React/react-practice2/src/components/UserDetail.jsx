@@ -23,21 +23,38 @@ const DetailTable = styled.table`
   }
 `
 
-const UserDetail = () => {
+const Button = styled.button`
+display: flex;
+justify-content: center;
+align-items: center;
+font-size: 12px;
+`
+
+const UserDetail = ({setOnline}) => {
   const users = React.useContext(userContext)
 
   const {id} = useParams();
 
   const user = users.find(u => u.id === parseInt(id))
 
+  const onClick = () => {
+      setOnline(user.isOnline = !user.isOnline)
+      console.log(user.isOnline)
+  }
+
+  const onChange = () => {
+    setOnline(user.id)
+  }
+
   return (
     <>
       <h2>{user.name}님의 상세 정보</h2>
       <DetailTable>
         <tbody>
-          <tr><td>이름</td><td>{user.name}</td></tr>
-          <tr><td>나이</td><td>{user.age}</td></tr>
-          <tr><td>상태</td><td>{user.isOnline ? "온라인" : "오프라인"}</td></tr>
+          <tr><td>이름</td><td colSpan={2}>{user.name}</td></tr>
+          <tr><td>나이</td><td colSpan={2}>{user.age}</td></tr>
+          <tr><td>상태</td><td onChange={onChange}>{user.isOnline ? "온라인" : "오프라인"}</td>
+          <td><Button onClick={onClick}>전환</Button></td></tr>
         </tbody>
       </DetailTable>
     </>

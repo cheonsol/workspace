@@ -6,6 +6,7 @@ import UserList from './components/UserList'
 import UserDetail from './components/UserDetail'
 import UserRegistration from './components/UserRegistration'
 import NotFound from './components/NotFound'
+import styled from 'styled-components'
 
 
 export const userContext = React.createContext();
@@ -27,6 +28,12 @@ const userList =  [{
     isOnline : false,
   }]
 
+  const Nav =styled.nav`
+    display : flex;
+    gap : 12px;
+    justify-content: center;
+    align-items: center;
+  `
 
 function App() {
   const [users, setUsers] = useState(userList)
@@ -36,19 +43,23 @@ function App() {
     setUsers([...users, user])
   }
 
+   const setOnline = (id) => {
+    setUsers(users.map(u => u.id === id ? {...u, isOnline : !u.isOnline} : u));
+  }
+
 
 
   return (
     <userContext.Provider value = {users}>
       <BrowserRouter>
-        <nav>
+        <Nav> 
           <Link to = "/">홈</Link>
-          <Link to = "/user">프로필</Link>
-        </nav>
+          <Link to = "/user">생성</Link>
+        </Nav>
         <Routes>
           <Route path = "/" element = {<UserList />}/>
-          <Route path = "/user/:id" element = {<UserDetail />}/>
-          <Route path = "/user" element = {<UserRegistration addUser = {addUser}/>}/>
+          <Route path = "/user/:id" element = {<UserDetail setOnline = {setOnline} />}/>
+          <Route path = "/user" element = {<UserRegistration addUser = {addUser} />}/>
           <Route path = "*" element = {<NotFound />}/>
         </Routes>
       </BrowserRouter>
