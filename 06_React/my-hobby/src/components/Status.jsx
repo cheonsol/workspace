@@ -5,6 +5,7 @@ const Status = ({status}) => {
 
   return (
     <>
+        
         {console.log(status)}
         <p>체력 : {currentHp}</p>
         <p>배고픔 : {hungry}</p>

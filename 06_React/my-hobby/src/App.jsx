@@ -8,13 +8,13 @@ function App() {
   const [turn, setTurn] = useState(1);
   const [history, setHistory] = useState(1);
 
-    const status = [{
+    const [status,setStatus] = useState({
         id : 1,
         maxHp : 100,
         currentHp : 100,
         hungry : 0,
         temperature : 36.5,
-    }]
+    })
 
     const scene = [{
         id : 1,
@@ -35,20 +35,27 @@ function App() {
     }]
   
     const currentScene = scene.find(s => s.id === history);
-    const currentStatus = status.find(h => h.id === turn);
+
+    const changeStatus= () => {
+      turn + 1 && setStatus({...status, hungry : status.hungry + 3})
+    }
 
     const onClick = (ev) => {
         {
           console.log(ev.target.value)
           setHistory(currentScene.next[ev.target.value - 1])
+          setTurn(turn + 1)
+          changeStatus()
         }
     }
 
+   
     
     return (
     <>
-     <Scene scene = {currentScene} onClick={onClick} />
-     <Status status = {currentStatus}/>
+      <div>turn : {turn}</div>
+      <Scene scene = {currentScene} onClick={onClick} />
+      <Status status = {status} />
     </>
   )
 }
