@@ -7,10 +7,8 @@ import { AuthWrapper, AuthBox, Title, InputGroup, StyledInput, AuthButton, LinkT
 
 const Login = () => {
   const navigator = useNavigate();
-  const { users, login } = useGameStore((state) => ({
-      users: state.users,
-      login: state.login,
-  }));
+  const users  = useGameStore((state) => state.users);
+  const login = useGameStore((state) => state.login);
 
   const [inputs, setInput] = useState({
     Uid : '',

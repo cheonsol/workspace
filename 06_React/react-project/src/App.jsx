@@ -5,6 +5,10 @@ import Login from './components/Login';
 import Home from './components/Home';
 import Logout from './components/Logout';
 import Mypage from './components/Mypage';
+import Board from './components/Board';
+import BoardDetail from './components/BoardDetail';
+import BoardWrite from './components/BoardWrite';
+import Game from './components/Game';
 
 function App() {
 
@@ -16,6 +20,10 @@ function App() {
           <Route path = '/login' element = {<Login />} />
           <Route path = '/logout/:id' element = {<Logout />} />
           <Route path = '/mypage/:id' element = {<Mypage />} />
+          <Route path = '/board' element = {<Board />} />
+          <Route path = '/boardWrite' element = {<BoardWrite />} />
+          <Route path = '/boardDetail/:boardId' element = {<BoardDetail />} />
+          <Route path = '/game' element = {<Game />} />  
         </Routes>
       </BrowserRouter>
   )
