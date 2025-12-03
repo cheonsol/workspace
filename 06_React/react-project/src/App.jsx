@@ -1,23 +1,23 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import './App.css'
 import SignUp from './components/SignUp'
-import { UserProvider } from './user/UserContext'
 import Login from './components/Login';
 import Home from './components/Home';
-
+import Logout from './components/Logout';
+import Mypage from './components/Mypage';
 
 function App() {
 
   return (
-    <UserProvider>
       <BrowserRouter>
         <Routes>
           <Route path = '/' element = {<Home />} />
           <Route path = '/signUp' element = {<SignUp />} />
           <Route path = '/login' element = {<Login />} />
+          <Route path = '/logout/:id' element = {<Logout />} />
+          <Route path = '/mypage/:id' element = {<Mypage />} />
         </Routes>
       </BrowserRouter>
-    </UserProvider>
   )
 }
 

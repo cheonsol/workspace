@@ -1,97 +1,109 @@
-import React, { useContext, useState } from 'react'
-import { UserContext } from '../user/UserContext';
-import { Button, CheckId, CheckNickName, Container, InputBox, InputContainer, LinkStyle } from '../layout/check';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import useGameStore from '../store/store';
+import Header from '../layout/Header';
+// 스타일 재사용
+import { AuthWrapper, AuthBox, Title, InputGroup, StyledInput, AuthButton, LinkText } from '../style/Auth.style';
 
 const SignUp = () => {
-    
     const navigator = useNavigate();
-
-    const { addUser, checkId, checkNickName } = useContext(UserContext);
+    const { users, addUser } = useGameStore((state) => ({
+        users : state.users,
+        addUser : state.addUser
+    }));
+    
     const [inputs, setInputs] = useState({
-        id : '',
+        Uid : '', 
         password : '',
         nickname : '',
     });
 
-    const { id, password, nickname } = inputs;
+    const { Uid, password, nickname } = inputs;
     
-    const [isCheckedId, setIsCheckedId] = useState(false);
-    const [ischeckedNickName, setIsCheckedNickName] = useState(false);
-
-
-
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setInputs({
-            ...inputs,
-            [name] : value,
-        });
-
-        
-
-    const checkSignId = checkId(e.target.value);
-    const checkSignNickName = checkNickName(e.target.value);
-        
-        
-        if(name === 'id'){
-            if(checkSignId){
-                if(value.length === 0){
-                    setIsCheckedId(false);
-                    return;
-                }
-                setIsCheckedId(false);
-            }else{
-                setIsCheckedId(true);
-            }
-     }   
-        
-        if(name === 'nickname'){
-            if(checkSignNickName){
-                if(value.length === 0){
-                    setIsCheckedNickName(false);
-                    return;
-                }
-                setIsCheckedNickName(false);
-            }else{
-                setIsCheckedNickName(true);
-            }
-        }
+        setInputs({ ...inputs, [name] : value });
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        const isAnyEmpty = Object.values(inputs).includes('');
-
-        if(isAnyEmpty){
-            alert('모든 항목을 입력해주십시오.')
+        // 1. 빈칸 체크
+        if(!Uid.trim() || !password.trim() || !nickname.trim()){
+            alert('모든 항목을 입력해주세요.');
             return;
         }
 
-        if(!checkId || !checkNickName){
-            alert('중복 확인이 필요합니다.')
+        // 2. 중복 체크
+        const isIdExist = users.find(u => u.Uid === Uid);
+        const isNickExist = users.find(u => u.nickname === nickname);
+
+        if(isIdExist) {
+            alert('이미 존재하는 아이디입니다.');
+            return;
+        }
+        if(isNickExist) {
+            alert('이미 존재하는 닉네임입니다.');
             return;
         }
 
+        // 3. 가입 완료 (inputs 그대로 넘김 - Uid 이름 맞춤)
         addUser(inputs);
 
-        alert('회원가입이 완료되었습니다.')
+        alert('모험가 등록이 완료되었습니다! 로그인해주세요.');
         navigator('/login');
     };
 
     return (
-    <form onSubmit={handleSubmit}>
-        
-    <Container>
-            <InputContainer><div>아이디</div> <div><InputBox type = 'text' onChange={handleChange} name = 'id' value = {id} placeholder='id를 입력하세요.'></InputBox></div><CheckId $isCheckedId={isCheckedId} /></InputContainer>
-            <InputContainer><div>비밀번호</div> <div><InputBox type = 'password' onChange={handleChange} name = 'password' value = {password} placeholder='비밀번호를 입력하세요.'></InputBox></div></InputContainer>
-            <InputContainer><div>닉네임 </div><div><InputBox type = 'text' onChange={handleChange} name = 'nickname' value = {nickname} placeholder='닉네임을 입력하세요.'></InputBox></div><CheckNickName $isCheckedNickName={ischeckedNickName} /></InputContainer>
-            <InputContainer><Button>회원가입</Button></InputContainer>
-            <InputContainer><LinkStyle to = '/login'>로그인</LinkStyle></InputContainer>
-    </Container>
-    </form>
+    <>
+      <Header />
+      <AuthWrapper>
+        <AuthBox onSubmit={handleSubmit}>
+            <Title>모험가 등록</Title>
+            
+            <InputGroup>
+                <label>아이디</label> 
+                <StyledInput 
+                    type='text' 
+                    name='Uid' 
+                    value={Uid} 
+                    onChange={handleChange}
+                    placeholder="사용할 아이디"
+                />
+            </InputGroup>
+
+            <InputGroup>
+                <label>비밀번호</label> 
+                <StyledInput 
+                    type='password' 
+                    name='password' 
+                    value={password} 
+                    onChange={handleChange}
+                    placeholder="사용할 비밀번호"
+                />
+            </InputGroup>
+
+            <InputGroup>
+                <label>닉네임 (모험가 이름)</label> 
+                <StyledInput 
+                    type='text' 
+                    name='nickname' 
+                    value={nickname} 
+                    onChange={handleChange}
+                    placeholder="게임에서 쓸 이름"
+                />
+            </InputGroup>
+
+            <AuthButton type="submit">등록 완료</AuthButton>
+            
+            <LinkText>
+                이미 계정이 있으신가요?
+                <Link to="/login">로그인 하러 가기</Link>
+            </LinkText>
+        </AuthBox>
+      </AuthWrapper>
+    </>
     )
 }
 
-export default SignUp
+export default SignUp;
