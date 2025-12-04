@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import useGameStore from '../store/store'
+import useGameStore from '../store/user'
 import { useNavigate } from 'react-router-dom';
 
 const Logout = () => {

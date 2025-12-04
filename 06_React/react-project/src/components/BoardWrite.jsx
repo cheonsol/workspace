@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import useBoardStore from '../store/board';
-import useGameStore from '../store/store'; // 작성자 정보용
+import useGameStore from '../store/user'; // 작성자 정보용
 import { useNavigate } from 'react-router-dom';
 import Header from '../layout/Header';
 

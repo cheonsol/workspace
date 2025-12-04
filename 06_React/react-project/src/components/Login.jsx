@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import useGameStore from '../store/store';
+import useGameStore from '../store/user';
 import Header from '../layout/Header';
 // 스타일 컴포넌트 import
 import { AuthWrapper, AuthBox, Title, InputGroup, StyledInput, AuthButton, LinkText } from '../style/Auth.style';
@@ -9,6 +9,9 @@ const Login = () => {
   const navigator = useNavigate();
   const users  = useGameStore((state) => state.users);
   const login = useGameStore((state) => state.login);
+
+  // 디버깅: 현재 users 배열 확인
+  console.log('현재 등록된 사용자:', users);
 
   const [inputs, setInput] = useState({
     Uid : '',

@@ -111,3 +111,118 @@ export const LoginPrompt = styled.div`
     margin-bottom: 1rem;
   }
 `;
+
+// 탭 컨테이너
+export const TabContainer = styled.div`
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #444;
+  width: 100%;
+  max-width: 600px;
+`;
+
+// 탭 버튼
+export const TabButton = styled.button`
+  padding: 12px 25px;
+  background-color: ${(props) => props.active ? '#d4af37' : 'transparent'};
+  color: ${(props) => props.active ? '#000' : '#aaa'};
+  border: none;
+  border-bottom: 3px solid ${(props) => props.active ? '#d4af37' : 'transparent'};
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: all 0.2s;
+
+  &:hover {
+    color: #d4af37;
+  }
+`;
+
+// 상품 그리드
+export const ShopGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+  width: 100%;
+`;
+
+// 상품 카드
+export const ShopCard = styled.div`
+  background-color: #1e1e1e;
+  border: 2px solid ${(props) => props.isLocked ? '#666' : '#444'};
+  border-radius: 10px;
+  padding: 15px;
+  text-align: center;
+  transition: all 0.3s;
+  cursor: ${(props) => props.isLocked ? 'not-allowed' : 'pointer'};
+  opacity: ${(props) => props.isLocked ? 0.6 : 1};
+
+  &:hover {
+    ${(props) => !props.isLocked && `
+      border-color: #d4af37;
+      transform: translateY(-5px);
+    `}
+  }
+`;
+
+// 상품 아이콘
+export const ItemIcon = styled.div`
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+`;
+
+// 상품 이름
+export const ItemName = styled.h3`
+  color: #d4af37;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+`;
+
+// 상품 설명
+export const ItemDesc = styled.p`
+  color: #aaa;
+  font-size: 0.85rem;
+  margin-bottom: 10px;
+  min-height: 30px;
+`;
+
+// 상품 정보
+export const ItemInfo = styled.div`
+  color: #888;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+`;
+
+// 상품 가격
+export const ItemPrice = styled.div`
+  color: #4ade80;
+  font-weight: bold;
+  margin-bottom: 10px;
+`;
+
+// 레벨 제한
+export const LevelLock = styled.div`
+  color: #ff6b6b;
+  font-weight: bold;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+`;
+
+// 구매 버튼
+export const BuyButton = styled.button`
+  width: 100%;
+  padding: 8px 12px;
+  background-color: ${(props) => props.disabled ? '#666' : '#d4af37'};
+  color: ${(props) => props.disabled ? '#999' : '#000'};
+  border: none;
+  border-radius: 5px;
+  cursor: ${(props) => props.disabled ? 'not-allowed' : 'pointer'};
+  font-weight: bold;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    background-color: #e5c158;
+  }
+`;

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import useGameStore from '../store/store';
+import useGameStore from '../store/user';
 import Header from '../layout/Header';
 // 스타일 재사용
 import { AuthWrapper, AuthBox, Title, InputGroup, StyledInput, AuthButton, LinkText } from '../style/Auth.style';

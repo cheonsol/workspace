@@ -1,5 +1,5 @@
 import React from 'react';
-import useGameStore from '../store/store';
+import useGameStore from '../store/user';
 import { HeaderWrapper, Logo, NavList, StyledLink } from '../style/Header.sytle';
 // 방금 만든 스타일 컴포넌트들 import
 
@@ -28,10 +28,10 @@ const Header = () => {
                         {/* 로그인 했을 때 */}
                         <li>
                             {/* 마이페이지: ID보다는 Uid를 주로 쓰지만, 작성하신 id 그대로 유지 */}
-                            <StyledLink to={`/mypage/${currentUser.id}`}>내 정보</StyledLink>
+                            <StyledLink to={`/mypage/${currentUser.Uid}`}>내 정보</StyledLink>
                         </li>
                         <li>
-                            <StyledLink to={`/Logout/${currentUser.id}`}>로그아웃</StyledLink>
+                            <StyledLink to={`/Logout`}>로그아웃</StyledLink>
                         </li>
                     </>
                 ) : (

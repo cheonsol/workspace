@@ -21,6 +21,7 @@ const useBoardStore = create(
                 writer : '',
                 writeDate : new Date().toLocaleString(),
                 show : true,
+                comments : [],
 
                 ...newBoard,
             }]
@@ -32,6 +33,37 @@ const useBoardStore = create(
             })),
              deleteBoard : (boardId) => set((state) =>({
                 boards : state.boards.map((board) => board.id === boardId ? {...board , show : false} : board) 
+            })),
+
+            // 댓글 추가
+            addComment : (boardId, newComment) => set((state) =>({
+                boards : state.boards.map((board) => 
+                    board.id === boardId 
+                        ? {...board, comments: [...(board.comments || []), newComment]}
+                        : board
+                )
+            })),
+
+            // 댓글 삭제
+            deleteComment : (boardId, commentId) => set((state) =>({
+                boards : state.boards.map((board) => 
+                    board.id === boardId 
+                        ? {...board, comments: board.comments.filter(c => c.id !== commentId)}
+                        : board
+                )
+            })),
+
+            // 댓글 수정
+            updateComment : (boardId, commentId, updatedContent) => set((state) =>({
+                boards : state.boards.map((board) => 
+                    board.id === boardId 
+                        ? {...board, comments: board.comments.map(c => 
+                            c.id === commentId 
+                                ? {...c, content: updatedContent, date: new Date().toLocaleString()}
+                                : c
+                          )}
+                        : board
+                )
             })),
         }),
             {

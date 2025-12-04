@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import useBoardStore from '../store/board';
 import { useNavigate } from 'react-router-dom';
 import Header from '../layout/Header'; // 헤더 추가
@@ -31,6 +31,10 @@ const Board = () => {
   
   // show가 true인 게시글만 필터링
   const activeBoards = boards.filter(b => b.show);
+
+  useEffect(() => {
+
+  })
 
   return (
     <>
