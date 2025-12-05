@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import ClearMenu from './ClearMenu';
 import useGameStore from '../store/user';
 import useSkillStore from '../store/skill';
 import useItemStore from '../store/item';
@@ -59,6 +60,8 @@ const Game = () => {
     };
 
     // --- State 정의 ---
+        // 던전 클리어 메뉴 상태
+        const [showClearMenu, setShowClearMenu] = useState(false);
     const [currentMonsterData, setCurrentMonsterData] = useState(getRandomMonster());
     const [monsterHp, setMonsterHp] = useState(Number(currentMonsterData?.maxHp) || 100);
     const [userHp, setUserHp] = useState(Number(user?.currentHp) || 100);
@@ -345,7 +348,6 @@ const Game = () => {
 
                 // checkLevelUp: 경험치 획득 후 레벨업 가능 여부 확인
                 const levelUpResult = checkLevelUp(user.exp + event.exp, user.LV);
-                // newQueue 선언 추가 (currentQueue 복사)
                 let newQueue = [...currentQueue];
                 if (levelUpResult.canLevelUp && user.LV < 100) {
                     levelUp();
@@ -353,7 +355,8 @@ const Game = () => {
                         type: 'MESSAGE', 
                         text: `🎊 레벨업! 이제 LV.${user.LV + 1}입니다!` 
                     });
-                } else if (user.LV === 100) {
+                } else if (user.LV === 100 && user.exp < getRequiredExp(100)) {
+                    // 만렙이지만 경험치가 부족한 경우에만 메시지
                     newQueue.unshift({ 
                         type: 'MESSAGE', 
                         text: `👑 최강! 만렙 LV.100에 도달했습니다!` 
@@ -394,23 +397,28 @@ const Game = () => {
                 break;
 
               case 'Battle_Win':
-                // 1. 몬스터 처치 후 새로운 몬스터 등장
+                // 1. 최상층(3층) 보스 처치 시 클리어 처리
+                if (currentMonsterData.isBoss && currentFloor === 3) {
+                    setMessage('🎉 던전 클리어! 축하합니다!');
+                    setShowBossChoice(false);
+                    setIsProcessingTurn(false);
+                    setShowClearMenu(true);
+                    setBattleQueue([]);
+                    return;
+                }
+                // 2. 몬스터 처치 후 새로운 몬스터 등장
                 const newMonster = getRandomMonster();
                 setCurrentMonsterData(newMonster);
                 setMonsterHp(newMonster.maxHp);
-                
-                // 2. 메시지 출력
+                // 3. 메시지 출력
                 if (currentMonsterData.isBoss) {
                     setMessage(`🎉 보스를 격파했습니다! 다음 층으로 진입하시겠습니까?`);
                     setShowBossChoice(true);
                     setIsProcessingTurn(false);
                 } else {
                     setMessage(`새로운 [${newMonster.name}]이(가) 나타났다!`);
-                    // 3. 전투 종료 상태로 변경 (버튼 다시 활성화)
                     setIsProcessingTurn(false);
                 }
-                
-                // 4. 여기서 큐를 비우고 리턴 (더 이상 진행할 큐가 없음)
                 setBattleQueue([]);
                 return;
 
@@ -430,7 +438,7 @@ const Game = () => {
                 <StatusHeader>
                     {/* 몬스터 정보 */}
                     <CharacterInfo>
-                        <strong>{currentMonsterData.name} Lv.{Math.floor(currentMonsterData.atk/2)} {currentMonsterData.isBoss ? '👑 보스' : ''}</strong> 
+                        <strong style={{color: '#222'}}>{currentMonsterData.name} <span style={{color: '#222'}}>Lv.{Math.floor(currentMonsterData.atk/2)}</span> {currentMonsterData.isBoss ? '👑 보스' : ''}</strong>
                         {shouldSpawnBoss && <small style={{color: '#ff6b6b', fontWeight: 'bold'}}>⚠️ 보스 출현!</small>}
                         {!shouldSpawnBoss && <small style={{color: '#aaa'}}>처치: {currentKillCount}/5</small>}
                         <HpBarFrame>
@@ -478,7 +486,7 @@ const Game = () => {
             </DialogueBox>
 
             {/* 버튼 영역 */}
-            {!isProcessingTurn && !showSkillSelect && !showItemSelect && !showBossChoice && (
+            {!isProcessingTurn && !showSkillSelect && !showItemSelect && !showBossChoice && !showClearMenu && (
                 <ButtonGrid>
                     <ActionButton onClick={() => handleBattleAction('ATTACK')}>
                         ⚔️ 공격
@@ -489,10 +497,23 @@ const Game = () => {
                     <ActionButton onClick={() => handleBattleAction('ITEM')}>
                         💊 아이템
                     </ActionButton>
-                    <ActionButton onClick={() => navigator('/')}>
+                    <ActionButton onClick={() => navigator('/')}> 
                         🏃 도망
                     </ActionButton>
                 </ButtonGrid>
+            )}
+
+            {/* 던전 클리어 메뉴 컴포넌트 */}
+            {showClearMenu && (
+                <ClearMenu onRetry={() => {
+                    setShowClearMenu(false);
+                    setIsInitialized(false);
+                    setMessage('다시 도전!');
+                    setCurrentMonsterData(getRandomMonster());
+                    setMonsterHp(getRandomMonster().maxHp);
+                    setUserHp(user.currentHp);
+                    setBattleQueue([]);
+                }} />
             )}
 
             {/* 보스 처치 후 선택 메뉴 */}
