@@ -22,10 +22,11 @@ const useBoardStore = create(
                 writeDate : new Date().toLocaleString(),
                 show : true,
                 comments : [],
+                imageUrl : '',
 
                 ...newBoard,
             }]
-            })), 
+            })),
 
              updateBoard : (targetBoard) => set((state) =>({
                 boards : state.boards.map((board) => board.id === targetBoard.id ? {...board, ...targetBoard} : board)

@@ -1,18 +1,18 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import './App.css'
-import SignUp from './components/SignUp'
-import Login from './components/Login';
-import Home from './components/Home';
-import Logout from './components/Logout';
-import Mypage from './components/Mypage';
-import Board from './components/Board';
-import BoardDetail from './components/BoardDetail';
-import BoardWrite from './components/BoardWrite';
-import BoardEdit from './components/BoardEdit';
-import Game from './components/Game';
-import Skill from './components/Skill';
-import Item from './components/Item';
-import PrivateRoute from './components/PrivateRoute';
+import Home from './components/Home'
+import SignUp from './components/Auth/SignUp'
+import Login from './components/Auth/Login'
+import Logout from './components/Logout'
+import Mypage from './components/Mypage'
+import Board from './components/Board'
+import BoardDetail from './components/BoardDetail'
+import BoardWrite from './components/BoardWrite'
+import BoardEdit from './components/BoardEdit'
+import Game from './components/Game'
+import Skill from './components/Skill'
+import Item from './components/Item'
+import PrivateRoute from './components/PrivateRoute'
 
 function App() {
 

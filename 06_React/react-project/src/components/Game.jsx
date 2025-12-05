@@ -1,15 +1,24 @@
-import React, { useEffect, useState } from 'react'
-import useGameStore from '../store/user'
-import useSkillStore from '../store/skill'
-import useItemStore from '../store/item'
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import useGameStore from '../store/user';
+import useSkillStore from '../store/skill';
+import useItemStore from '../store/item';
 import useMonsterStore from '../store/monster';
+import { useNavigate } from 'react-router-dom';
+// 게임 유틸리티 함수 import - 데미지 계산, 크리티컬, 경험치 계산 등
+import { 
+    calculateDamage,        // 플레이어의 기본 공격 데미지 계산
+    isCritical,             // 크리티컬 발생 여부 확인
+    calculateSkillDamage,   // 스킬 사용 시 데미지 계산
+    calculateMonsterDamage, // 몬스터 데미지 계산
+    getRequiredExp,         // 레벨업에 필요한 경험치
+    checkLevelUp            // 레벨업 체크
+} from '../utils/gameUtils';
 
 // 스타일 컴포넌트 import (기존 유지)
 import { 
-  GameContainer, StatusWindow, StatusHeader, CharacterInfo, 
-  HpBarFrame, HpBarFill, MonsterImage, DialogueBox, NextArrow, 
-  ButtonGrid, ActionButton 
+    GameContainer, StatusWindow, StatusHeader, CharacterInfo, 
+    HpBarFrame, HpBarFill, MonsterImage, DialogueBox, NextArrow, 
+    ButtonGrid, ActionButton 
 } from '../style/Game.style';
 
 const Game = () => {
@@ -21,6 +30,7 @@ const Game = () => {
     const addGold = useGameStore((state) => state.addGold);
     const updateHp = useGameStore((state) => state.updateHp);
     const moveToNextFloor = useGameStore((state) => state.moveToNextFloor);
+    const levelUp = useGameStore((state) => state.levelUp);
     
     const monsters = useMonsterStore((state) => state.monsters);
     const killCount = useMonsterStore((state) => state.killCount);
@@ -40,12 +50,16 @@ const Game = () => {
     const floorMonsters = monsters.filter(m => m.floor === currentFloor);
     const normalMonsters = floorMonsters.filter(m => !m.isBoss);
     const bossMonster = floorMonsters.find(m => m.isBoss);
-    const shouldSpawnBoss = killCount[currentFloor] >= 5;
+    const currentKillCount = killCount[currentFloor] || 0;
+    const shouldSpawnBoss = currentKillCount >= 5;
     
-    const currentMonsterData = shouldSpawnBoss ? bossMonster : 
-        normalMonsters[Math.floor(Math.random() * normalMonsters.length)];
+    const getRandomMonster = () => {
+        return shouldSpawnBoss ? bossMonster : 
+            normalMonsters[Math.floor(Math.random() * normalMonsters.length)];
+    };
 
     // --- State 정의 ---
+    const [currentMonsterData, setCurrentMonsterData] = useState(getRandomMonster());
     const [monsterHp, setMonsterHp] = useState(Number(currentMonsterData?.maxHp) || 100);
     const [userHp, setUserHp] = useState(Number(user?.currentHp) || 100);
     const [message, setMessage] = useState(""); 
@@ -53,22 +67,22 @@ const Game = () => {
     const [isProcessingTurn, setIsProcessingTurn] = useState(true);
     const [showSkillSelect, setShowSkillSelect] = useState(false);
     const [showItemSelect, setShowItemSelect] = useState(false);
+    const [showBossChoice, setShowBossChoice] = useState(false);
 
     let userDamage = 0;
     let isMonsterDead = false;
 
-    // 초기 진입, 몬스터가 변할 때마다 실행
+    // 초기 진입에만 실행 (한 번만)
+    const [isInitialized, setIsInitialized] = useState(false);
+    
     useEffect(() => {
-       if (currentMonsterData) {
+       if (currentMonsterData && !isInitialized) {
             setMessage(`야생의 [${currentMonsterData.name}]이(가) 나타났다!`);
             setMonsterHp(currentMonsterData.maxHp);
             setUserHp(user.currentHp);
+            setIsInitialized(true);
         }
-    }, [currentMonsterData]);
-
-    const newMonster = () => {
-          setMonsterHp(Number(currentMonsterData?.maxHp));
-    }
+    }, []);
 
     // 스킬 사용 핸들러
     const handleUseSkill = (skill) => {
@@ -76,7 +90,8 @@ const Game = () => {
         setIsProcessingTurn(true);
 
         const newQueue = [];
-        const skillDamage = Math.floor(skill.damage * (1 + user.atk / 10));
+        // calculateSkillDamage: 스킬 기본 데미지와 플레이어 공격력을 고려한 총 데미지 계산
+        const skillDamage = calculateSkillDamage(skill.damage, user.atk);
 
         newQueue.push({ type: 'MESSAGE', text: `✨ ${user.nickname}이(가) [${skill.name}]을(를) 사용했다!` });
         newQueue.push({ type: 'MESSAGE', text: `💥 ${currentMonsterData.name}에게 ${skillDamage}의 피해!` });
@@ -85,9 +100,9 @@ const Game = () => {
         const predictedMonsterHp = monsterHp - skillDamage;
 
         if (predictedMonsterHp > 0) {
-            const monsterDamage = Number(Math.random() * 100 < currentMonsterData.luk
-                ? Math.floor(currentMonsterData.atk * 2)
-                : Math.floor(currentMonsterData.atk));
+            // calculateMonsterDamage: 몬스터의 공격력과 행운도로 실제 데미지 계산
+            // 행운도가 높을수록 크리티컬 확률 증가, 크리티컬 시 데미지 2배
+            const monsterDamage = calculateMonsterDamage(currentMonsterData);
 
             newQueue.push({ type: 'MESSAGE', text: `💢 ${currentMonsterData.name}의 반격!` });
             newQueue.push({ type: 'MESSAGE', text: `🩸 당신은 ${monsterDamage}의 피해를 입었다.` });
@@ -130,9 +145,8 @@ const Game = () => {
 
         useItem(item.id); // 인벤토리에서 아이템 소비
 
-        const monsterDamage = Number(Math.random() * 100 < currentMonsterData.luk
-            ? Math.floor(currentMonsterData.atk * 2)
-            : Math.floor(currentMonsterData.atk));
+        // calculateMonsterDamage: 몬스터 데미지 계산 (행운도 기반 크리티컬 포함)
+        const monsterDamage = calculateMonsterDamage(currentMonsterData);
 
         newQueue.push({ type: 'MESSAGE', text: `💢 ${currentMonsterData.name}의 공격!` });
         newQueue.push({ type: 'MESSAGE', text: `🩸 당신은 ${monsterDamage}의 피해를 입었다.` });
@@ -156,13 +170,14 @@ const Game = () => {
 
         // type이 ATTACK일 때, 기본 공격
         if (type === 'ATTACK') {
-          // 치명타 확률 계산. 치명타 시 데미지 2배
-            userDamage = Number(Math.random() * 100 < user.luk 
-                ? Math.floor(user.atk * 2) 
-                : Math.floor(user.atk));
+          // calculateDamage: 플레이어 공격력과 크리티컬 여부로 데미지 계산
+          // isCritical: 행운도(luk) 기반 크리티컬 확률 판정 (true시 데미지 2배)
+            const isCrit = isCritical(user.luk);
+            userDamage = calculateDamage(user.atk, isCrit ? 2 : 1);
+            
           // 대본에 type 별 정보를 저장  
             newQueue.push({ type: 'MESSAGE', text: `⚔️ ${user.nickname}의 공격!` });
-            newQueue.push({ type: 'MESSAGE', text: `💥 ${currentMonsterData.name}에게 ${userDamage}의 피해!` });
+            newQueue.push({ type: 'MESSAGE', text: `💥 ${currentMonsterData.name}에게 ${userDamage}의 피해!${isCrit ? ' 💥 크리티컬!' : ''}` });
             newQueue.push({ type: 'MONSTER_DAMAGE', amount: userDamage });
 
         } else if (type === 'SKILL') {
@@ -196,9 +211,8 @@ const Game = () => {
 
         // 몬스터의 HP가 0 이상일 때, 반격. 몬스터의 스킬도 추가 예정.
         if (predictedMonsterHp > 0) {
-            const monsterDamage = Number(Math.random() * 100 < currentMonsterData.luk
-              ? Math.floor(currentMonsterData.atk * 2)
-              : Math.floor(currentMonsterData.atk));
+            // calculateMonsterDamage: 몬스터 데미지 계산 (행운도 기반 크리티컬 포함)
+            const monsterDamage = calculateMonsterDamage(currentMonsterData);
 
             newQueue.push({ type: 'MESSAGE', text: `💢 ${currentMonsterData.name}의 반격!` });
             newQueue.push({ type: 'MESSAGE', text: `🩸 당신은 ${monsterDamage}의 피해를 입었다.` });
@@ -220,6 +234,40 @@ const Game = () => {
         setBattleQueue(newQueue);
         processNextEvent(newQueue);
 
+    }
+
+    // 보스 처치 후 선택
+    const handleBossChoice = (goNext) => {
+        setShowBossChoice(false);
+        
+        if (goNext) {
+            // 다음 층으로 이동
+            resetKillCount(currentFloor);
+            moveToNextFloor();
+            
+            // 새로운 층의 일반 몬스터 선택
+            const nextFloor = currentFloor + 1;
+            const nextFloorMonsters = monsters.filter(m => m.floor === nextFloor);
+            const nextNormalMonsters = nextFloorMonsters.filter(m => !m.isBoss);
+            const newMonster = nextNormalMonsters[Math.floor(Math.random() * nextNormalMonsters.length)];
+            
+            // setTimeout으로 상태 업데이트 지연
+            setTimeout(() => {
+                setMessage("새로운 층에 입장했다!");
+                setCurrentMonsterData(newMonster);
+                setMonsterHp(newMonster?.maxHp || 100);
+                setUserHp(user.currentHp);
+                setIsProcessingTurn(false);
+            }, 100);
+        } else {
+            // 현재 층에서 계속 전투 (보스 제외한 일반 몬스터)
+            const continueNormalMonsters = normalMonsters;
+            const newMonster = continueNormalMonsters[Math.floor(Math.random() * continueNormalMonsters.length)];
+            setMessage(`야생의 [${newMonster.name}]이(가) 나타났다!`);
+            setCurrentMonsterData(newMonster);
+            setMonsterHp(newMonster?.maxHp || 100);
+            setIsProcessingTurn(false);
+        }
     } 
  
 
@@ -294,6 +342,23 @@ const Game = () => {
                 addExp(event.exp);
                 addGold(event.gold);
                 incrementKillCount(currentFloor);
+                
+                // checkLevelUp: 경험치 획득 후 레벨업 가능 여부 확인
+                const levelUpResult = checkLevelUp(user.exp + event.exp, user.LV);
+                if (levelUpResult.canLevelUp && user.LV < 100) {
+                    // 레벨업 처리
+                    levelUp();
+                    newQueue.unshift({ 
+                        type: 'MESSAGE', 
+                        text: `🎊 레벨업! 이제 LV.${user.LV + 1}입니다!` 
+                    });
+                } else if (user.LV === 100) {
+                    newQueue.unshift({ 
+                        type: 'MESSAGE', 
+                        text: `👑 최강! 만렙 LV.100에 도달했습니다!` 
+                    });
+                }
+                
                 if(currentQueue.length > 0) {
                     setBattleQueue(currentQueue);
                     setTimeout(() => processNextEvent(currentQueue), 0);
@@ -319,8 +384,7 @@ const Game = () => {
                     learnSkillFromBook(randomSkill);
                 }
 
-                resetKillCount(currentFloor);
-                moveToNextFloor();
+                // 층 이동은 handleBossChoice에서 수행 (사용자 선택 후)
 
                 if(currentQueue.length > 0) {
                     setBattleQueue(currentQueue);
@@ -335,13 +399,9 @@ const Game = () => {
                 
                 // 2. 메시지 출력
                 if (currentMonsterData.isBoss) {
-                    setMessage(`🎉 보스를 격파했습니다! 다음 층으로 이동합니다...`);
-                    // 3초 후 새로운 몬스터 표시
-                    setTimeout(() => {
-                        setMonsterHp(currentMonsterData.maxHp);
-                        setMessage("새로운 층에 입장했다!");
-                        setIsProcessingTurn(false);
-                    }, 3000);
+                    setMessage(`🎉 보스를 격파했습니다! 다음 층으로 진입하시겠습니까?`);
+                    setShowBossChoice(true);
+                    setIsProcessingTurn(false);
                 } else {
                     setMessage(`새로운 [${currentMonsterData.name}]이(가) 나타났다!`);
                     // 3. 전투 종료 상태로 변경 (버튼 다시 활성화)
@@ -368,10 +428,9 @@ const Game = () => {
                 <StatusHeader>
                     {/* 몬스터 정보 */}
                     <CharacterInfo>
-                        <strong>{currentMonsterData.name}</strong> 
-                        <small>Lv.{Math.floor(currentMonsterData.atk/2)} {currentMonsterData.isBoss ? '👑 보스' : ''}</small>
+                        <strong>{currentMonsterData.name} Lv.{Math.floor(currentMonsterData.atk/2)} {currentMonsterData.isBoss ? '👑 보스' : ''}</strong> 
                         {shouldSpawnBoss && <small style={{color: '#ff6b6b', fontWeight: 'bold'}}>⚠️ 보스 출현!</small>}
-                        {!shouldSpawnBoss && <small style={{color: '#aaa'}}>처치: {killCount[currentFloor]}/5</small>}
+                        {!shouldSpawnBoss && <small style={{color: '#aaa'}}>처치: {currentKillCount}/5</small>}
                         <HpBarFrame>
                             <HpBarFill 
                                 $width={(monsterHp / currentMonsterData.maxHp) * 100} 
@@ -417,7 +476,7 @@ const Game = () => {
             </DialogueBox>
 
             {/* 버튼 영역 */}
-            {!isProcessingTurn && !showSkillSelect && !showItemSelect && (
+            {!isProcessingTurn && !showSkillSelect && !showItemSelect && !showBossChoice && (
                 <ButtonGrid>
                     <ActionButton onClick={() => handleBattleAction('ATTACK')}>
                         ⚔️ 공격
@@ -430,6 +489,18 @@ const Game = () => {
                     </ActionButton>
                     <ActionButton onClick={() => navigator('/')}>
                         🏃 도망
+                    </ActionButton>
+                </ButtonGrid>
+            )}
+
+            {/* 보스 처치 후 선택 메뉴 */}
+            {showBossChoice && (
+                <ButtonGrid>
+                    <ActionButton onClick={() => handleBossChoice(true)} style={{backgroundColor: '#4ade80'}}>
+                        ✅ 다음 층으로 진입
+                    </ActionButton>
+                    <ActionButton onClick={() => handleBossChoice(false)} style={{backgroundColor: '#60a5fa'}}>
+                        🔄 현재 층에서 계속
                     </ActionButton>
                 </ButtonGrid>
             )}

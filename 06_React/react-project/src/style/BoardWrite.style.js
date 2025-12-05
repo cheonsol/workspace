@@ -99,3 +99,41 @@ export const SubmitButton = styled.button`
     box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
   }
 `;
+
+// 이미지 업로드 영역
+export const ImageUploadArea = styled.div`
+  width: 100%;
+  height: 250px;
+  border: 2px dashed #d4af37;
+  border-radius: 8px;
+  background-color: rgba(212, 175, 55, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 25px;
+  transition: all 0.3s;
+  cursor: pointer;
+
+  &:hover {
+    background-color: rgba(212, 175, 55, 0.1);
+    border-color: #fff;
+  }
+`;
+
+// 이미지 미리보기
+export const ImagePreview = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-radius: 6px;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+`;

@@ -13,7 +13,7 @@ const useGameStore = create(
         users : [
             {
                 Uid: 'testuser',
-                password: '1234',
+                password: '12345678',
                 nickname: '최강의 테스터',
                 LV: 100,
                 exp: 999999,
@@ -21,13 +21,20 @@ const useGameStore = create(
                 currentHp: 500,
                 maxMp: 500,
                 currentMp: 500,
-                atk: 100,
-                def: 100,
-                dex: 100,
+                atk: 999,
+                def: 999,
+                dex: 999,
                 luk: 100,
                 floor: 1,
                 gold: 999999,
-                equippedItems: {}
+                equippedItems: {},
+                statPoints: 999,
+                baseAtk: 100,
+                baseDef: 100,
+                baseDex: 100,
+                baseLuk: 100,
+                baseMaxHp: 500,
+                baseMaxMp: 500
             }
         ],
 
@@ -49,7 +56,14 @@ const useGameStore = create(
                     luk : 10,
                     floor : 1,
                     gold : 0,
-                    equippedItems : {}
+                    equippedItems : {},
+                    statPoints : 0,
+                    baseAtk : 10,
+                    baseDef : 10,
+                    baseDex : 10,
+                    baseLuk : 10,
+                    baseMaxHp : 100,
+                    baseMaxMp : 100
             }]
         })),
 
@@ -154,11 +168,106 @@ const useGameStore = create(
                         : u
                 )
             };
+        }),
+
+        // 레벨 업
+        levelUp : () => set((state) => {
+            if (!state.currentUser) return state;
+            
+            const newLV = state.currentUser.LV + 1;
+            const isMaxLevel = newLV >= 100;
+            
+            const updatedUser = {
+                ...state.currentUser,
+                LV: Math.min(newLV, 100),
+                exp: isMaxLevel ? 999999 : 0,
+                maxHp: state.currentUser.maxHp + 10,
+                currentHp: state.currentUser.maxHp + 10,
+                maxMp: state.currentUser.maxMp + 10,
+                currentMp: state.currentUser.maxMp + 10,
+                atk: state.currentUser.atk + 5,
+                def: state.currentUser.def + 3,
+                dex: state.currentUser.dex + 2,
+                luk: state.currentUser.luk + 2,
+                statPoints: state.currentUser.statPoints + 5,
+                baseAtk: (state.currentUser.baseAtk || 10) + 5,
+                baseDef: (state.currentUser.baseDef || 10) + 3,
+                baseDex: (state.currentUser.baseDex || 10) + 2,
+                baseLuk: (state.currentUser.baseLuk || 10) + 2,
+                baseMaxHp: (state.currentUser.baseMaxHp || 100) + 10,
+                baseMaxMp: (state.currentUser.baseMaxMp || 100) + 10
+            };
+            
+            return {
+                currentUser: updatedUser,
+                users: state.users.map(u =>
+                    u.nickname === state.currentUser?.nickname
+                        ? updatedUser
+                        : u
+                )
+            };
+        }),
+
+        // 스탯 분배 (statPoints 소비하여 특정 스탯 증가)
+        allocateStat : (statName) => set((state) => {
+            if (!state.currentUser || state.currentUser.statPoints <= 0) return state;
+            
+            const statIncrement = {
+                hp: 1,
+                mp: 1,
+                atk: 1,
+                def: 1,
+                dex: 1,
+                luk: 1
+            };
+            
+            const increment = statIncrement[statName] || 0;
+            if (increment === 0) return state;
+            
+            const updatedUser = {
+                ...state.currentUser,
+                statPoints: state.currentUser.statPoints - 1,
+                ...(statName === 'hp' && {
+                    maxHp: state.currentUser.maxHp + increment,
+                    currentHp: Math.min(state.currentUser.currentHp + increment, state.currentUser.maxHp + increment),
+                    baseMaxHp: (state.currentUser.baseMaxHp || state.currentUser.maxHp) + increment
+                }),
+                ...(statName === 'mp' && {
+                    maxMp: state.currentUser.maxMp + increment,
+                    currentMp: Math.min(state.currentUser.currentMp + increment, state.currentUser.maxMp + increment),
+                    baseMaxMp: (state.currentUser.baseMaxMp || state.currentUser.maxMp) + increment
+                }),
+                ...(statName === 'atk' && { 
+                    atk: state.currentUser.atk + increment,
+                    baseAtk: (state.currentUser.baseAtk || state.currentUser.atk) + increment
+                }),
+                ...(statName === 'def' && { 
+                    def: state.currentUser.def + increment,
+                    baseDef: (state.currentUser.baseDef || state.currentUser.def) + increment
+                }),
+                ...(statName === 'dex' && { 
+                    dex: state.currentUser.dex + increment,
+                    baseDex: (state.currentUser.baseDex || state.currentUser.dex) + increment
+                }),
+                ...(statName === 'luk' && { 
+                    luk: state.currentUser.luk + increment,
+                    baseLuk: (state.currentUser.baseLuk || state.currentUser.luk) + increment
+                })
+            };
+            
+            return {
+                currentUser: updatedUser,
+                users: state.users.map(u =>
+                    u.nickname === state.currentUser?.nickname
+                        ? updatedUser
+                        : u
+                )
+            };
         })
     }),
         {
             name : 'user-storage',
-            version: 2,
+            version: 3,
         }
     )
 )

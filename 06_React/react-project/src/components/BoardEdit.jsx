@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import Header from '../layout/Header';
 import useBoardStore from '../store/board';
 import useGameStore from '../store/user';
-import Header from '../layout/Header';
 
 import { 
   PageWrapper, 
@@ -36,12 +36,6 @@ const BoardEdit = () => {
 
   // 초기값 설정 및 권한 확인
   useEffect(() => {
-    if (!currentUser) {
-      alert("로그인이 필요합니다.");
-      navigator('/login');
-      return;
-    }
-
     if (!board) {
       alert("존재하지 않는 의뢰서입니다.");
       navigator('/board');

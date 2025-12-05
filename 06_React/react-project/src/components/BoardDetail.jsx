@@ -1,33 +1,41 @@
-import React, { useState } from 'react'; // useState 추가
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import useBoardStore from '../store/board';
 import Header from '../layout/Header';
+import useBoardStore from '../store/board';
 import useGameStore from '../store/user';
-
-// 스타일 import (아래에서 새로 만든 스타일 컴포넌트들도 추가해야 합니다)
 import { 
   DetailWrapper, DetailHeader, DetailContent, ButtonArea, ActionButton,
-  // 👇 새로 추가된 스타일 컴포넌트들
   CommentArea, CommentHeader, CommentForm, CommentInput, SubmitButton, 
   CommentList, CommentItem, CommentInfo, CommentText, DeleteText, EditText
 } from '../style/BoardDetail.style';
+// 게시판 내용 표시 시 데이터 포매팅 함수들
+import {
+  formatDate,  // 날짜를 읽기 좋은 형식으로 변환
+  truncateText // 긴 텍스트를 지정된 길이로 자름
+} from '../utils/formatters';
 
 const BoardDetail = () => {
+  // URL 파라미터에서 boardId 추출
   const { boardId } = useParams();
+  // currentUser 정보를 store에서 가져옴
   const currentUser = useGameStore((state) => state.currentUser);
   const navigator = useNavigate();
+  // 게시글 정보를 store에서 가져옴
   const boards = useBoardStore((state) => state.boards);
+  // 댓글관련 함수들을 store에서 가져옴
   const addComment = useBoardStore((state) => state.addComment);
   const deleteComment = useBoardStore((state) => state.deleteComment);
   const updateComment = useBoardStore((state) => state.updateComment);
 
-  // --- 댓글 관련 State ---
+  // 댓글 관련 state
   const [comment, setComment] = useState(""); // 입력된 댓글
   const [editingId, setEditingId] = useState(null); // 수정 중인 댓글 ID
   const [editingContent, setEditingContent] = useState(""); // 수정 중인 내용
 
+  // 게시글 조회. useParams로 가져온 boardId를 숫자로 변환하여 비교
   const board = boards.find((b) => b.id === Number(boardId));
 
+  // id 조회 후, 게시글이 없을 경우. 나중에 404 페이지를 만들어 nagator할 생각.
   if (!board) {
     return (
       <>
@@ -41,13 +49,13 @@ const BoardDetail = () => {
   }
 
   const { title, contents, writer, writeDate } = board;
+  // 수정, 삭제 기능을 위한 작성자 확인
   const isWriter = (writer === currentUser?.nickname);
 
-  // --- 댓글 등록 핸들러 ---
   const handleCommentSubmit = () => {
-    if (!currentUser) return alert("로그인이 필요합니다.");
+    // 공백을 제거하고 댓글 내용이 비어있는지 확인
     if (!comment.trim()) return alert("댓글 내용을 입력해주세요.");
-
+    // 새로운 댓글 객체
     const newComment = {
       id: Date.now(), // 고유 ID (임시)
       writer: currentUser.nickname,
@@ -61,6 +69,7 @@ const BoardDetail = () => {
 
   // --- 댓글 삭제 핸들러 ---
   const handleDeleteComment = (id) => {
+    // alert는 확인만 가능. confirm은 확인/취소 가능.
     if (window.confirm("댓글을 삭제하시겠습니까?")) {
       deleteComment(Number(boardId), id);
     }
@@ -72,7 +81,6 @@ const BoardDetail = () => {
     setEditingContent(content);
   };
 
-  // --- 댓글 수정 완료 ---
   const handleEditComplete = () => {
     if (!editingContent.trim()) {
       alert("댓글 내용을 입력해주세요.");
@@ -83,7 +91,6 @@ const BoardDetail = () => {
     setEditingContent("");
   };
 
-  // --- 댓글 수정 취소 ---
   const handleEditCancel = () => {
     setEditingId(null);
     setEditingContent("");
@@ -100,12 +107,26 @@ const BoardDetail = () => {
           <div className="info">
              <span>No. {board.id}</span>
              <span>👤 의뢰인: {writer}</span>
-             <span>📅 {writeDate ? writeDate.toString().slice(0, 21) : 'Unknown'}</span>
+             <span>📅 {formatDate(writeDate) || 'Unknown'}</span>
           </div>
         </DetailHeader>
 
         {/* 게시글 내용 */}
         <DetailContent>
+          {board.imageUrl && (
+            <div style={{ marginBottom: '20px', textAlign: 'center' }}>
+              <img 
+                src={board.imageUrl} 
+                alt="의뢰 이미지" 
+                style={{
+                  maxWidth: '100%',
+                  maxHeight: '400px',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
+                }} 
+              />
+            </div>
+          )}
           {contents}
         </DetailContent>
 
@@ -146,7 +167,7 @@ const BoardDetail = () => {
                 <CommentItem key={c.id}>
                   <CommentInfo>
                     <strong>{c.writer}</strong>
-                    <span>{c.date}</span>
+                    <span>{formatDate(c.date)}</span>
                     {/* 내가 쓴 댓글이면 삭제, 수정 버튼 표시 */}
                     {currentUser?.nickname === c.writer && (
                       <>

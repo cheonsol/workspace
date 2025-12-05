@@ -1,6 +1,6 @@
 import React from 'react';
-import useSkillStore from '../store/skill';
 import Header from '../layout/Header';
+import useSkillStore from '../store/skill';
 import { 
   PageWrapper, 
   SkillContainer, 
