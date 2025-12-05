@@ -342,11 +342,12 @@ const Game = () => {
                 addExp(event.exp);
                 addGold(event.gold);
                 incrementKillCount(currentFloor);
-                
+
                 // checkLevelUp: 경험치 획득 후 레벨업 가능 여부 확인
                 const levelUpResult = checkLevelUp(user.exp + event.exp, user.LV);
+                // newQueue 선언 추가 (currentQueue 복사)
+                let newQueue = [...currentQueue];
                 if (levelUpResult.canLevelUp && user.LV < 100) {
-                    // 레벨업 처리
                     levelUp();
                     newQueue.unshift({ 
                         type: 'MESSAGE', 
@@ -358,10 +359,9 @@ const Game = () => {
                         text: `👑 최강! 만렙 LV.100에 도달했습니다!` 
                     });
                 }
-                
-                if(currentQueue.length > 0) {
-                    setBattleQueue(currentQueue);
-                    setTimeout(() => processNextEvent(currentQueue), 0);
+                if(newQueue.length > 0) {
+                    setBattleQueue(newQueue);
+                    setTimeout(() => processNextEvent(newQueue), 0);
                     return;
                 }
                 break;
@@ -394,8 +394,10 @@ const Game = () => {
                 break;
 
               case 'Battle_Win':
-               // 1. 몬스터 체력 리셋 (새 몬스터 등장 연출)
-                setMonsterHp(currentMonsterData.maxHp);
+                // 1. 몬스터 처치 후 새로운 몬스터 등장
+                const newMonster = getRandomMonster();
+                setCurrentMonsterData(newMonster);
+                setMonsterHp(newMonster.maxHp);
                 
                 // 2. 메시지 출력
                 if (currentMonsterData.isBoss) {
@@ -403,7 +405,7 @@ const Game = () => {
                     setShowBossChoice(true);
                     setIsProcessingTurn(false);
                 } else {
-                    setMessage(`새로운 [${currentMonsterData.name}]이(가) 나타났다!`);
+                    setMessage(`새로운 [${newMonster.name}]이(가) 나타났다!`);
                     // 3. 전투 종료 상태로 변경 (버튼 다시 활성화)
                     setIsProcessingTurn(false);
                 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { StatusWindow, StatusHeader, CharacterInfo, HpBarFrame, HpBarFill, MonsterImage } from '../../style/Game.style';
 
-const GameStatus = ({ currentMonsterData, monsterHp, user, userHp, shouldSpawnBoss, currentKillCount, currentFloor }) => {
+const GameStatus = ({ currentMonsterData, monsterHp, user, userHp, shouldSpawnBoss, currentKillCount }) => {
   return (
     <StatusWindow>
       <StatusHeader>
