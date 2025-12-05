@@ -155,8 +155,8 @@ export const validateBoardTitle = (title) => {
     return { isValid: false, message: '제목은 문자열이어야 합니다.' };
   }
   const t = title.trim();
-  if (t.length < 5) {
-    return { isValid: false, message: '제목은 5자 이상이어야 합니다.' };
+  if (t.length < 1) {
+    return { isValid: false, message: '제목은 1자 이상이어야 합니다.' };
   }
   if (t.length > 100) {
     return { isValid: false, message: '제목은 100자 이하여야 합니다.' };
@@ -190,8 +190,8 @@ export const validateBoardContent = (content) => {
     return { isValid: false, message: '내용은 문자열이어야 합니다.' };
   }
   const t = content.trim();
-  if (t.length < 10) {
-    return { isValid: false, message: '내용은 10자 이상이어야 합니다.' };
+  if (t.length < 1) {
+    return { isValid: false, message: '내용은 1자 이상이어야 합니다.' };
   }
   if (t.length > 2000) {
     return { isValid: false, message: '내용은 2000자 이하여야 합니다.' };

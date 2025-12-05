@@ -11,7 +11,9 @@ import {
   Label, 
   TitleInput, 
   ContentInput, 
-  SubmitButton 
+  SubmitButton, 
+  ImageUploadArea, 
+  ImagePreview 
 } from '../style/BoardWrite.style';
 
 const BoardEdit = () => {
@@ -26,10 +28,11 @@ const BoardEdit = () => {
   // State
   const [inputs, setInput] = useState({
     title: '',
-    contents: ''
+    contents: '',
+    imageUrl: ''
   });
 
-  const { title, contents } = inputs;
+  const { title, contents, imageUrl } = inputs;
 
   // 게시글 조회
   const board = boards.find((b) => b.id === Number(boardId));
@@ -48,12 +51,35 @@ const BoardEdit = () => {
       return;
     }
 
-    // 기존 값 불러오기
+    // 기존 값 불러오기 (이미지 포함)
     setInput({
       title: board.title,
-      contents: board.contents
+      contents: board.contents,
+      imageUrl: board.imageUrl || ''
     });
   }, [board, currentUser, boardId, navigator]);
+  // 이미지 업로드 처리
+  const handleImageUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setInput({
+          ...inputs,
+          imageUrl: event.target?.result
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // 이미지 제거
+  const handleRemoveImage = () => {
+    setInput({
+      ...inputs,
+      imageUrl: ''
+    });
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -72,7 +98,7 @@ const BoardEdit = () => {
       return;
     }
 
-    // 게시글 수정
+    // 게시글 수정 (이미지 포함)
     updateBoard({
       id: Number(boardId),
       ...inputs
@@ -89,7 +115,6 @@ const BoardEdit = () => {
   return (
     <>
       <Header />
-      
       <PageWrapper>
         <WriteForm onSubmit={handleSubmit}>
           <TitleHeader>📜 의뢰서 수정</TitleHeader>
@@ -113,6 +138,46 @@ const BoardEdit = () => {
               onChange={handleChange}
               placeholder="의뢰 내용을 상세히 적어주세요."
             />
+          </div>
+
+          <div>
+            <Label>의뢰 이미지 (선택사항)</Label>
+            <ImageUploadArea>
+              {imageUrl ? (
+                <ImagePreview>
+                  <img src={imageUrl} alt="의뢰 이미지" />
+                  <button 
+                    type="button" 
+                    onClick={handleRemoveImage}
+                    style={{
+                      position: 'absolute',
+                      top: '10px',
+                      right: '10px',
+                      padding: '5px 10px',
+                      backgroundColor: '#ff6b6b',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    ❌ 제거
+                  </button>
+                </ImagePreview>
+              ) : (
+                <label style={{ cursor: 'pointer', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ fontSize: '2.5rem', marginBottom: '10px' }}>🖼️</div>
+                  <div style={{ fontSize: '1rem', color: '#aaa' }}>클릭하여 이미지를 업로드하세요</div>
+                  <div style={{ fontSize: '0.85rem', color: '#666', marginTop: '5px' }}>PNG, JPG 형식 지원</div>
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={handleImageUpload}
+                    style={{ display: 'none' }}
+                  />
+                </label>
+              )}
+            </ImageUploadArea>
           </div>
 
           <SubmitButton type="submit">수정 완료</SubmitButton>
