@@ -8,8 +8,11 @@ import Header from '../layout/Header';
 
 const Mypage = () => {
 
-  const [activeTab, setActiveTab] = useState('profile'); // 'profile', 'shop'
+  const [activeTab, setActiveTab] = useState('profile'); // 'profile', 'shop', 'equipment'
   const currentUser = useGameStore((state) => state.currentUser);
+  const equipItem = useGameStore((state) => state.equipItem);
+  const unequipItem = useGameStore((state) => state.unequipItem);
+  
   const allSkills = useSkillStore((state) => state.skills);
   const playerSkills = useSkillStore((state) => state.playerSkills);
   const learnSkill = useSkillStore((state) => state.learnSkill);
@@ -31,6 +34,12 @@ const Mypage = () => {
                 onClick={() => setActiveTab('profile')}
               >
                 👤 프로필
+              </TabButton>
+              <TabButton 
+                active={activeTab === 'equipment'}
+                onClick={() => setActiveTab('equipment')}
+              >
+                🎒 착용 아이템
               </TabButton>
               <TabButton 
                 active={activeTab === 'shop'}
@@ -89,6 +98,54 @@ const Mypage = () => {
                     <span className="value">{currentUser.gold}</span>
                   </StatItem>
                 </StatGrid>
+              </ProfileCard>
+            )}
+
+            {activeTab === 'equipment' && (
+              <ProfileCard style={{ width: '100%', maxWidth: '1000px' }}>
+                <CardTitle>🎒 착용 아이템</CardTitle>
+
+                <div style={{ marginTop: '20px' }}>
+                  <h3 style={{ color: '#d4af37', marginBottom: '15px' }}>👕 착용 중인 아이템</h3>
+                  {inventory.length === 0 ? (
+                    <p style={{ color: '#888', textAlign: 'center' }}>착용할 아이템이 없습니다.</p>
+                  ) : (
+                    <ShopGrid>
+                      {inventory.map((item) => {
+                        const isEquipped = currentUser.equippedItems && currentUser.equippedItems[item.id];
+                        
+                        return (
+                          <ShopCard key={item.id} isLocked={false}>
+                            <ItemIcon>{item.icon}</ItemIcon>
+                            <ItemName>{item.name}</ItemName>
+                            <ItemDesc>{item.description}</ItemDesc>
+                            <ItemInfo>수량: {item.quantity}개</ItemInfo>
+                            <ItemPrice>
+                              {item.effect === 'heal' ? `💚 ${item.value}` :
+                               item.effect === 'attack' ? `⚔️ +${item.value}` :
+                               item.effect === 'defense' ? `🛡️ +${item.value}` :
+                               item.effect === 'maxMana' ? `💙 +${item.value}` :
+                               item.effect === 'maxHp' ? `❤️ +${item.value}` : ''}
+                            </ItemPrice>
+                            <BuyButton 
+                              onClick={() => {
+                                if (isEquipped) {
+                                  unequipItem(item.id);
+                                  alert('아이템을 벗었습니다.');
+                                } else {
+                                  equipItem(item.id);
+                                  alert(`[${item.name}]을 착용했습니다.`);
+                                }
+                              }}
+                            >
+                              {isEquipped ? '✓ 착용 중' : '착용'}
+                            </BuyButton>
+                          </ShopCard>
+                        );
+                      })}
+                    </ShopGrid>
+                  )}
+                </div>
               </ProfileCard>
             )}
 

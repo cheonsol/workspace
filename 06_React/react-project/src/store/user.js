@@ -27,6 +27,7 @@ const useGameStore = create(
                 luk: 100,
                 floor: 1,
                 gold: 999999,
+                equippedItems: {}
             }
         ],
 
@@ -48,6 +49,7 @@ const useGameStore = create(
                     luk : 10,
                     floor : 1,
                     gold : 0,
+                    equippedItems : {}
             }]
         })),
 
@@ -109,7 +111,50 @@ const useGameStore = create(
                     ? { ...u, floor: u.floor + 1 }
                     : u
             )
-        }))
+        })),
+
+        // 아이템 착용
+        equipItem : (itemId) => set((state) => {
+            if (!state.currentUser) return state;
+            
+            const equippedItems = state.currentUser.equippedItems || {};
+            
+            // 이미 착용된 같은 타입의 아이템이 있으면 벗기
+            const newEquipped = { ...equippedItems, [itemId]: true };
+            
+            return {
+                currentUser : {
+                    ...state.currentUser,
+                    equippedItems: newEquipped
+                },
+                users : state.users.map(u =>
+                    u.nickname === state.currentUser?.nickname
+                        ? { ...u, equippedItems: newEquipped }
+                        : u
+                )
+            };
+        }),
+
+        // 아이템 벗기
+        unequipItem : (itemId) => set((state) => {
+            if (!state.currentUser) return state;
+            
+            const equippedItems = state.currentUser.equippedItems || {};
+            const newEquipped = { ...equippedItems };
+            delete newEquipped[itemId];
+            
+            return {
+                currentUser : {
+                    ...state.currentUser,
+                    equippedItems: newEquipped
+                },
+                users : state.users.map(u =>
+                    u.nickname === state.currentUser?.nickname
+                        ? { ...u, equippedItems: newEquipped }
+                        : u
+                )
+            };
+        })
     }),
         {
             name : 'user-storage',

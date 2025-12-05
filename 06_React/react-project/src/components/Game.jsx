@@ -384,11 +384,18 @@ const Game = () => {
                     <CharacterInfo $align="right">
                         <strong>{user.nickname}</strong>
                         <small>LV.{user.LV} - {user.floor}층</small>
-                        <small>{userHp}/{user.maxHp}</small>
+                        <small style={{color: '#4ade80'}}>❤️ {userHp}/{user.maxHp}</small>
                         <HpBarFrame $align="right">
                             <HpBarFill 
                                 $width={(userHp / user.maxHp) * 100} 
                                 $color="#4ade80" 
+                            />
+                        </HpBarFrame>
+                        <small style={{color: '#60a5fa'}}>💙 {user.currentMp}/{user.maxMp}</small>
+                        <HpBarFrame $align="right">
+                            <HpBarFill 
+                                $width={(user.currentMp / user.maxMp) * 100} 
+                                $color="#60a5fa" 
                             />
                         </HpBarFrame>
                     </CharacterInfo>
