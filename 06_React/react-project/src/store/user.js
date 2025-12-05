@@ -267,7 +267,6 @@ const useGameStore = create(
     }),
         {
             name : 'user-storage',
-            version: 3,
         }
     )
 )

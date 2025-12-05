@@ -179,7 +179,6 @@ react-project/
 
 ### 개발 도구
 - **Vite** - 모던 번들러
-- **ESLint** - 코드 품질 관리
 
 ### 저장소
 - **localStorage** - 브라우저 로컬 데이터 저장소
