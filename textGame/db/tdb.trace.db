@@ -1,0 +1,15 @@
+2025-12-12 10:08:13.609535+09:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE [*]USER"; expected "identifier"; SQL statement:
+CREATE TABLE USER [42001-240]
+2025-12-12 10:09:09.001186+09:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "MONSTER" already exists; SQL statement:
+CREATE TABLE MONSTER [42101-240]
+2025-12-12 10:09:09.002189+09:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "BOARD" already exists; SQL statement:
+CREATE TABLE BOARD [42101-240]
+2025-12-12 10:09:09.002189+09:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "ITEM" already exists; SQL statement:
+CREATE TABLE ITEM [42101-240]
+2025-12-12 10:09:09.003696+09:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SKILL" already exists; SQL statement:
+CREATE TABLE SKILL [42101-240]
