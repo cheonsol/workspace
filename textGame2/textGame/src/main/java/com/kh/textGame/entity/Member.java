@@ -93,6 +93,10 @@ public class Member {
     )
     private java.util.List<Skill> skills = new java.util.ArrayList<>();
 
+    // 아이템 인벤토리 (MemberItem 엔티티를 통해 관리)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<MemberItem> memberItems = new java.util.ArrayList<>();
+
     // 스킬 배우기 편의 메서드
     public void learnSkill(Skill skill) {
         if (!this.skills.contains(skill)) {
