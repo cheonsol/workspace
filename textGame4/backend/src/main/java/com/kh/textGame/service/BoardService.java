@@ -20,7 +20,7 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
 
-    // 게시글 생성
+
     public BoardDto createBoard(BoardDto boardDto, String username) {
         Member member = memberRepository.findByUserId(username)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid user"));
@@ -35,7 +35,7 @@ public class BoardService {
         return convertEntityToDto(savedBoard);
     }
 
-    // 모든 게시글 조회
+
     @Transactional(readOnly = true)
     public List<BoardDto> getAllBoards() {
         return boardRepository.findAll().stream()
@@ -43,7 +43,7 @@ public class BoardService {
                 .collect(Collectors.toList());
     }
 
-    // 게시글 ID로 조회
+
     @Transactional(readOnly = true)
     public BoardDto getBoardById(Long id) {
         return boardRepository.findById(id)
@@ -51,7 +51,7 @@ public class BoardService {
                 .orElse(null);
     }
     
-    // 게시글 수정
+
     public BoardDto updateBoard(Long id, BoardDto boardDto, String username) throws IllegalAccessException {
         Board board = boardRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid board Id:" + id));
         Member member = memberRepository.findByUserId(username)
@@ -68,7 +68,7 @@ public class BoardService {
         return convertEntityToDto(updatedBoard);
     }
 
-    // 게시글 삭제
+
     public void deleteBoard(Long id, String username) throws IllegalAccessException {
         Board board = boardRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid board Id:" + id));
         Member member = memberRepository.findByUserId(username)

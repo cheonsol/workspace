@@ -17,7 +17,7 @@ public class MonsterService {
 
     private final MonsterRepository monsterRepository;
 
-    // 몬스터 생성 (관리자 권한 필요)
+
     public MonsterDto createMonster(MonsterDto monsterDto) {
         Monster monster = Monster.builder()
                 .name(monsterDto.getName())
@@ -37,7 +37,7 @@ public class MonsterService {
         return convertEntityToDto(savedMonster);
     }
 
-    // 모든 몬스터 조회
+
     @Transactional(readOnly = true)
     public List<MonsterDto> getAllMonsters() {
         return monsterRepository.findAll().stream()
@@ -45,7 +45,7 @@ public class MonsterService {
                 .collect(Collectors.toList());
     }
 
-    // 몬스터 ID로 조회
+
     @Transactional(readOnly = true)
     public MonsterDto getMonsterById(Long id) {
         return monsterRepository.findById(id)
@@ -53,12 +53,12 @@ public class MonsterService {
                 .orElse(null);
     }
 
-    // 몬스터 수정 (관리자 권한 필요)
+
     public MonsterDto updateMonster(Long id, MonsterDto monsterDto) {
         Monster monster = monsterRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid monster Id:" + id));
 
-        // @Setter가 엔티티에 있으므로 직접 수정
+
         monster.setName(monsterDto.getName());
         monster.setImg(monsterDto.getImg());
         monster.setFloor(monsterDto.getFloor());
@@ -76,7 +76,7 @@ public class MonsterService {
         return convertEntityToDto(updatedMonster);
     }
 
-    // 몬스터 삭제 (관리자 권한 필요)
+
     public void deleteMonster(Long id) {
         monsterRepository.deleteById(id);
     }

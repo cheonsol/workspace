@@ -2,276 +2,233 @@ package com.kh.textGame.service;
 
 import com.kh.textGame.dto.MemberDto;
 import com.kh.textGame.dto.MemberStatUpdateDto;
-import com.kh.textGame.entity.Item;
-import com.kh.textGame.entity.Member;
-import com.kh.textGame.entity.MemberItem;
-import com.kh.textGame.entity.Skill;
-import com.kh.textGame.repository.ItemRepository;
-import com.kh.textGame.repository.MemberItemRepository;
-import com.kh.textGame.repository.MemberRepository;
-import com.kh.textGame.repository.SkillRepository;
+import com.kh.textGame.dto.SignUpDto;
+import com.kh.textGame.dto.SkillDto;
+import com.kh.textGame.entity.*;
+import com.kh.textGame.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import com.kh.textGame.dto.SkillDto; // 추가
 
 @Service
-@Transactional
 @RequiredArgsConstructor
+@Transactional
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final SkillRepository skillRepository;
     private final ItemRepository itemRepository;
     private final MemberItemRepository memberItemRepository;
-    private final SkillRepository skillRepository; // MemberDto에 Skill 정보도 포함될 수 있으므로 주입
+    private final PasswordEncoder passwordEncoder;
 
-    // 사용자 상세 정보 조회 (JWT 인증 후 호출)
+    public void signUp(SignUpDto signUpDto) {
+        if (memberRepository.existsByUserId(signUpDto.getUserId())) {
+            throw new RuntimeException("이미 존재하는 아이디입니다.");
+        }
+
+        Member member = Member.builder()
+                .userId(signUpDto.getUserId())
+                .password(passwordEncoder.encode(signUpDto.getPassword()))
+                .nickname(signUpDto.getNickname())
+                .build();
+
+        memberRepository.save(member);
+    }
+
     @Transactional(readOnly = true)
     public MemberDto getMemberDetails(String userId) {
-        Member member = memberRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found with userId: " + userId));
-
-        // MemberDto로 변환
+        Member member = memberRepository.findByUserIdWithSkills(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
         return convertToMemberDto(member);
     }
 
-    // 사용자 스탯 업데이트 (부분 업데이트)
-    public MemberDto updateMemberStats(String userId, MemberStatUpdateDto updateDto) {
+    public MemberDto updateMemberStats(String userId, MemberStatUpdateDto dto) {
         Member member = memberRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found with userId: " + userId));
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
-        // DTO에 값이 있는 필드만 업데이트
-        Optional.ofNullable(updateDto.getLevel()).ifPresent(member::setLevel);
-        Optional.ofNullable(updateDto.getExp()).ifPresent(member::setExp);
-        Optional.ofNullable(updateDto.getGold()).ifPresent(member::setGold);
-        Optional.ofNullable(updateDto.getFloor()).ifPresent(member::setFloor);
-        Optional.ofNullable(updateDto.getStatPoints()).ifPresent(member::setStatPoints);
-        Optional.ofNullable(updateDto.getMaxHp()).ifPresent(member::setMaxHp);
-        Optional.ofNullable(updateDto.getCurrentHp()).ifPresent(member::setCurrentHp);
-        Optional.ofNullable(updateDto.getMaxMp()).ifPresent(member::setMaxMp);
-        Optional.ofNullable(updateDto.getCurrentMp()).ifPresent(member::setCurrentMp);
-        Optional.ofNullable(updateDto.getAtk()).ifPresent(member::setAtk);
-        Optional.ofNullable(updateDto.getDef()).ifPresent(member::setDef);
-        Optional.ofNullable(updateDto.getDex()).ifPresent(member::setDex);
-        Optional.ofNullable(updateDto.getLuk()).ifPresent(member::setLuk);
-        
-        // base stats는 직접적으로 업데이트하지 않고, 다른 로직에 의해 파생되어야 할 수 있습니다.
-        // 필요하다면 updateDto에 base stats 필드도 추가하여 업데이트 로직을 구현할 수 있습니다.
+        int totalUsedPoints = dto.getAtk() + dto.getDef() + dto.getDex() + dto.getLuk();
+        if (member.getStatPoints() < totalUsedPoints) {
+            throw new RuntimeException("스탯 포인트가 부족합니다.");
+        }
 
-        return convertToMemberDto(memberRepository.save(member));
+        member.setBaseAtk(member.getBaseAtk() + dto.getAtk());
+        member.setBaseDef(member.getBaseDef() + dto.getDef());
+        member.setBaseDex(member.getBaseDex() + dto.getDex());
+        member.setBaseLuk(member.getBaseLuk() + dto.getLuk());
+        member.setStatPoints(member.getStatPoints() - totalUsedPoints);
+
+        recalculateFinalStats(member);
+        return convertToMemberDto(member);
     }
 
-
-    // 아이템 구매
     public MemberDto buyItem(String userId, Long itemId, int quantity) {
-        if (quantity <= 0) {
-            throw new IllegalArgumentException("Quantity must be positive.");
-        }
-        Member member = memberRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found with userId: " + userId));
-        Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new IllegalArgumentException("Item not found with id: " + itemId));
+        Member member = memberRepository.findByUserId(userId).orElseThrow();
+        Item item = itemRepository.findById(itemId).orElseThrow();
 
-        long totalPrice = (long) item.getPrice() * quantity;
-        if (member.getGold() < totalPrice) {
-            throw new IllegalArgumentException("Not enough gold to buy this item.");
-        }
+        long totalCost = (long) item.getPrice() * quantity;
+        if (member.getGold() < totalCost) throw new IllegalArgumentException("골드가 부족합니다.");
 
-        member.setGold(member.getGold() - totalPrice);
+        member.setGold(member.getGold() - totalCost);
 
-        Optional<MemberItem> existingMemberItem = memberItemRepository.findByMemberAndItem(member, item);
+        MemberItem memberItem = memberItemRepository.findByMemberAndItem(member, item)
+                .orElseGet(() -> MemberItem.builder()
+                        .member(member)
+                        .item(item)
+                        .quantity(0)
+                        .equipped(false)
+                        .build());
 
-        if (existingMemberItem.isPresent()) {
-            existingMemberItem.get().addQuantity(quantity);
-        } else {
-            MemberItem newMemberItem = MemberItem.builder()
-                    .member(member)
-                    .item(item)
-                    .quantity(quantity)
-                    .equipped(false)
-                    .build();
-            member.getMemberItems().add(newMemberItem); // 연관관계 설정
-        }
+        memberItem.addQuantity(quantity);
+        memberItemRepository.save(memberItem);
 
-        return convertToMemberDto(memberRepository.save(member));
+        return convertToMemberDto(member);
     }
 
-    // 아이템 판매
     public MemberDto sellItem(String userId, Long memberItemId, int quantity) {
-        if (quantity <= 0) {
-            throw new IllegalArgumentException("Quantity must be positive.");
-        }
-        Member member = memberRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found with userId: " + userId));
-        MemberItem memberItem = memberItemRepository.findById(memberItemId)
-                .orElseThrow(() -> new IllegalArgumentException("MemberItem not found with id: " + memberItemId));
+        Member member = memberRepository.findByUserId(userId).orElseThrow();
+        MemberItem memberItem = memberItemRepository.findById(memberItemId).orElseThrow();
 
-        if (!memberItem.getMember().equals(member)) {
-            throw new IllegalStateException("This item does not belong to the member.");
-        }
-        if (memberItem.getQuantity() < quantity) {
-            throw new IllegalArgumentException("Not enough quantity to sell.");
-        }
+        if (memberItem.isEquipped()) throw new IllegalStateException("장착 중인 아이템은 팔 수 없습니다.");
 
-        long sellPrice = (long) memberItem.getItem().getPrice() * quantity / 2; // 보통 구매가의 절반
-        member.setGold(member.getGold() + sellPrice);
+        memberItem.removeQuantity(quantity);
+        member.setGold(member.getGold() + (long) (memberItem.getItem().getPrice() * 0.5) * quantity);
 
-        if (memberItem.getQuantity() == quantity) {
-            // 모든 수량 판매 시 인벤토리에서 제거
-            member.getMemberItems().remove(memberItem);
+        if (memberItem.getQuantity() == 0) {
             memberItemRepository.delete(memberItem);
-        } else {
-            memberItem.removeQuantity(quantity);
-            memberItemRepository.save(memberItem);
+            member.getMemberItems().remove(memberItem);
         }
 
-        return convertToMemberDto(memberRepository.save(member));
+        return convertToMemberDto(member);
     }
-    
-    // 아이템 사용 (예: 포션)
+
     public MemberDto useItem(String userId, Long memberItemId) {
-        Member member = memberRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found with userId: " + userId));
-        MemberItem memberItem = memberItemRepository.findById(memberItemId)
-                .orElseThrow(() -> new IllegalArgumentException("MemberItem not found with id: " + memberItemId));
-
-        if (!memberItem.getMember().equals(member)) {
-            throw new IllegalStateException("This item does not belong to the member.");
-        }
-        if (memberItem.getQuantity() <= 0) {
-            throw new IllegalArgumentException("No quantity to use.");
-        }
-        
+        Member member = memberRepository.findByUserId(userId).orElseThrow();
+        MemberItem memberItem = memberItemRepository.findById(memberItemId).orElseThrow();
         Item item = memberItem.getItem();
-        if (item.getType() == Item.ItemType.POTION || item.getType() == Item.ItemType.CONSUMABLE) {
-            // 아이템 효과 적용 (예: 체력/마나 회복)
-            member.setCurrentHp(Math.min(member.getMaxHp(), member.getCurrentHp() + item.getHealAmount()));
-            member.setCurrentMp(Math.min(member.getMaxMp(), member.getCurrentMp() + item.getManaRestoreAmount()));
-            
-            memberItem.removeQuantity(1); // 1개 사용
-            if (memberItem.getQuantity() == 0) {
-                member.getMemberItems().remove(memberItem);
-                memberItemRepository.delete(memberItem);
-            } else {
-                memberItemRepository.save(memberItem);
-            }
-        } else {
-            throw new IllegalArgumentException("This item cannot be used directly.");
+
+        if (item.getType() != Item.ItemType.POTION) throw new IllegalStateException("소모품이 아닙니다.");
+
+        member.setCurrentHp(Math.min(member.getMaxHp(), member.getCurrentHp() + item.getHealAmount()));
+        member.setCurrentMp(Math.min(member.getMaxMp(), member.getCurrentMp() + item.getManaRestoreAmount()));
+
+        memberItem.removeQuantity(1);
+        if (memberItem.getQuantity() == 0) {
+            memberItemRepository.delete(memberItem);
+            member.getMemberItems().remove(memberItem);
         }
 
-        return convertToMemberDto(memberRepository.save(member));
+        return convertToMemberDto(member);
     }
 
-    // 아이템 장착/장착 해제
     public MemberDto toggleEquipItem(String userId, Long memberItemId) {
-        Member member = memberRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found with userId: " + userId));
-        MemberItem memberItem = memberItemRepository.findById(memberItemId)
-                .orElseThrow(() -> new IllegalArgumentException("MemberItem not found with id: " + memberItemId));
+        Member member = memberRepository.findByUserId(userId).orElseThrow();
+        MemberItem targetItem = memberItemRepository.findById(memberItemId).orElseThrow();
 
-        if (!memberItem.getMember().equals(member)) {
-            throw new IllegalStateException("This item does not belong to the member.");
-        }
-        Item item = memberItem.getItem();
+        if (targetItem.getItem().getType() == Item.ItemType.POTION) throw new IllegalStateException("장착할 수 없는 아이템입니다.");
 
-        if (item.getType() == Item.ItemType.WEAPON || item.getType() == Item.ItemType.ARMOR) {
-            // 이미 장착 중인 같은 타입의 아이템이 있다면 해제
-            if (!memberItem.isEquipped()) { // 장착 시도
-                member.getMemberItems().stream()
-                        .filter(mi -> mi.isEquipped() && mi.getItem().getType() == item.getType())
-                        .forEach(MemberItem::unequip);
-                memberItem.equip();
-            } else { // 해제 시도
-                memberItem.unequip();
-            }
+        if (!targetItem.isEquipped()) {
+            member.getMemberItems().stream()
+                    .filter(mi -> mi.isEquipped() && mi.getItem().getType() == targetItem.getItem().getType())
+                    .forEach(MemberItem::unequip);
+            targetItem.equip();
         } else {
-            throw new IllegalArgumentException("This item type cannot be equipped.");
+            targetItem.unequip();
         }
 
-        return convertToMemberDto(memberRepository.save(member));
+        recalculateFinalStats(member);
+        return convertToMemberDto(member);
     }
 
+    private void recalculateFinalStats(Member member) {
+        int bonusAtk = 0, bonusDef = 0, bonusHp = 0, bonusMp = 0;
 
-    // Member 엔티티를 MemberDto로 변환하는 헬퍼 메서드
+        for (MemberItem mi : member.getMemberItems()) {
+            if (mi.isEquipped()) {
+                Item item = mi.getItem();
+                bonusAtk += item.getAttackBoost();
+                bonusDef += item.getDefenseBoost();
+                bonusHp += item.getHealthBoost();
+                bonusMp += item.getManaBoost();
+            }
+        }
+
+        member.setAtk(member.getBaseAtk() + bonusAtk);
+        member.setDef(member.getBaseDef() + bonusDef);
+        member.setMaxHp(member.getBaseMaxHp() + bonusHp);
+        member.setMaxMp(member.getBaseMaxMp() + bonusMp);
+    }
+
+    public void addExp(String userId, long earnedExp) {
+        Member member = memberRepository.findByUserId(userId).orElseThrow();
+        member.setExp(member.getExp() + earnedExp);
+        long requiredExp = member.getLevel() * 100L;
+        if (member.getExp() >= requiredExp) {
+            levelUp(member);
+        }
+    }
+
+    private void levelUp(Member member) {
+        member.setLevel(member.getLevel() + 1);
+        member.setExp(0);
+        member.setStatPoints(member.getStatPoints() + 5);
+        member.setBaseMaxHp(member.getBaseMaxHp() + 20);
+        member.setCurrentHp(member.getMaxHp());
+        recalculateFinalStats(member);
+    }
+
     private MemberDto convertToMemberDto(Member member) {
-        MemberDto memberDto = new MemberDto();
-        memberDto.setId(member.getId());
-        memberDto.setUserId(member.getUserId());
-        memberDto.setNickname(member.getNickname());
-        memberDto.setLevel(member.getLevel());
-        memberDto.setExp(member.getExp());
-        memberDto.setGold(member.getGold());
-        memberDto.setFloor(member.getFloor());
-        memberDto.setStatPoints(member.getStatPoints());
-        memberDto.setMaxHp(member.getMaxHp());
-        memberDto.setCurrentHp(member.getCurrentHp());
-        memberDto.setMaxMp(member.getMaxMp());
-        memberDto.setCurrentMp(member.getCurrentMp());
-        memberDto.setAtk(member.getAtk());
-        memberDto.setDef(member.getDef());
-        memberDto.setDex(member.getDex());
-        memberDto.setLuk(member.getLuk());
-        memberDto.setBaseMaxHp(member.getBaseMaxHp());
-        memberDto.setBaseMaxMp(member.getBaseMaxMp());
-        memberDto.setBaseAtk(member.getBaseAtk());
-        memberDto.setBaseDef(member.getBaseDef());
-        memberDto.setBaseDex(member.getBaseDex());
-        memberDto.setBaseLuk(member.getBaseLuk());
+        MemberDto dto = new MemberDto();
+        dto.setId(member.getId());
+        dto.setUserId(member.getUserId());
+        dto.setNickname(member.getNickname());
+        dto.setLevel(member.getLevel());
+        dto.setExp(member.getExp());
+        dto.setGold(member.getGold());
+        dto.setFloor(member.getFloor());
+        dto.setStatPoints(member.getStatPoints());
+        dto.setCurrentHp(member.getCurrentHp());
+        dto.setMaxHp(member.getMaxHp());
+        dto.setCurrentMp(member.getCurrentMp());
+        dto.setMaxMp(member.getMaxMp());
+        dto.setAtk(member.getAtk());
+        dto.setDef(member.getDef());
 
-        // 스킬 정보 추가
-        if (member.getSkills() != null) {
-            memberDto.setSkills(member.getSkills().stream()
-                    .map(this::convertToSkillDto)
-                    .collect(Collectors.toList()));
-        }
+        dto.setSkills(member.getMemberSkills().stream()
+                .map(MemberSkill::getSkill)
+                .map(this::convertToSkillDto)
+                .toList());
 
-        // 인벤토리 정보 추가
-        if (member.getMemberItems() != null) {
-            memberDto.setInventory(member.getMemberItems().stream()
-                    .map(this::convertToMemberItemDto)
-                    .collect(Collectors.toList()));
-        }
+        dto.setInventory(member.getMemberItems().stream()
+                .map(this::convertToMemberItemDto)
+                .toList());
 
-        return memberDto;
+        return dto;
     }
-    
-    // Skill 엔티티를 SkillDto로 변환하는 헬퍼 메서드 (중복 정의 방지를 위해 필요 시 SkillService에서 가져올 수 있음)
+
     private SkillDto convertToSkillDto(Skill skill) {
-        SkillDto skillDto = new SkillDto();
-        skillDto.setId(skill.getId());
-        skillDto.setName(skill.getName());
-        skillDto.setDescription(skill.getDescription());
-        skillDto.setIcon(skill.getIcon());
-        skillDto.setDamage(skill.getDamage());
-        skillDto.setManaCost(skill.getManaCost());
-        skillDto.setCooldown(skill.getCooldown());
-        skillDto.setHealing(skill.isHealing());
-        skillDto.setHealAmount(skill.getHealAmount());
-        return skillDto;
+        SkillDto dto = new SkillDto();
+        dto.setId(skill.getId());
+        dto.setName(skill.getName());
+        dto.setDescription(skill.getDescription());
+        dto.setDamage(skill.getDamage());
+        dto.setManaCost(skill.getManaCost());
+        return dto;
     }
 
-    // MemberItem 엔티티를 MemberDto.MemberItemDto로 변환하는 헬퍼 메서드
     private MemberDto.MemberItemDto convertToMemberItemDto(MemberItem memberItem) {
         MemberDto.MemberItemDto dto = new MemberDto.MemberItemDto();
+        Item item = memberItem.getItem();
         dto.setId(memberItem.getId());
-        dto.setItemId(memberItem.getItem().getId());
-        dto.setItemName(memberItem.getItem().getName());
-        dto.setItemDescription(memberItem.getItem().getDescription());
-        dto.setItemImg(memberItem.getItem().getImg());
-        dto.setItemType(memberItem.getItem().getType());
-        dto.setItemAttackBoost(memberItem.getItem().getAttackBoost());
-        dto.setItemDefenseBoost(memberItem.getItem().getDefenseBoost());
-        dto.setItemHealthBoost(memberItem.getItem().getHealthBoost());
-        dto.setItemManaBoost(memberItem.getItem().getManaBoost());
-        dto.setItemHealAmount(memberItem.getItem().getHealAmount());
-        dto.setItemManaRestoreAmount(memberItem.getItem().getManaRestoreAmount());
-        dto.setItemPrice(memberItem.getItem().getPrice());
         dto.setQuantity(memberItem.getQuantity());
         dto.setEquipped(memberItem.isEquipped());
+        dto.setItemId(item.getId());
+        dto.setItemName(item.getName());
+        dto.setItemType(item.getType());
+        dto.setItemAttackBoost(item.getAttackBoost());
+        dto.setItemDefenseBoost(item.getDefenseBoost());
         return dto;
     }
 }

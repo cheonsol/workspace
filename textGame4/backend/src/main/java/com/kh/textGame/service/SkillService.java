@@ -17,7 +17,7 @@ public class SkillService {
 
     private final SkillRepository skillRepository;
 
-    // 스킬 생성 (관리자 권한 필요)
+
     public SkillDto createSkill(SkillDto skillDto) {
         Skill skill = Skill.builder()
                 .name(skillDto.getName())
@@ -33,7 +33,7 @@ public class SkillService {
         return convertEntityToDto(savedSkill);
     }
 
-    // 모든 스킬 조회
+
     @Transactional(readOnly = true)
     public List<SkillDto> getAllSkills() {
         return skillRepository.findAll().stream()
@@ -41,7 +41,7 @@ public class SkillService {
                 .collect(Collectors.toList());
     }
 
-    // 스킬 ID로 조회
+
     @Transactional(readOnly = true)
     public SkillDto getSkillById(Long id) {
         return skillRepository.findById(id)
@@ -49,16 +49,12 @@ public class SkillService {
                 .orElse(null);
     }
 
-    // 스킬 수정 (관리자 권한 필요)
+
     public SkillDto updateSkill(Long id, SkillDto skillDto) {
         Skill skill = skillRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid skill Id:" + id));
         
-        // @Setter가 엔티티에 없지만, 빌더 패턴을 사용하거나 엔티티에 직접 수정 메서드를 추가할 수 있습니다.
-        // 현재는 편의상 모든 필드를 다시 설정합니다.
-        // Let's assume @Setter is present or add an update method in the Skill entity.
-        // For consistency, I will add @Setter to the Skill entity.
-        
+
         skill.setName(skillDto.getName());
         skill.setDescription(skillDto.getDescription());
         skill.setIcon(skillDto.getIcon());
@@ -72,7 +68,7 @@ public class SkillService {
         return convertEntityToDto(updatedSkill);
     }
 
-    // 스킬 삭제 (관리자 권한 필요)
+
     public void deleteSkill(Long id) {
         skillRepository.deleteById(id);
     }

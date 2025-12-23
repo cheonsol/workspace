@@ -23,7 +23,7 @@ public class CommentService {
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
 
-    // 댓글 생성
+
     public CommentDto createComment(CommentDto commentDto, String username) {
         Board board = boardRepository.findById(commentDto.getBoardId())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid board ID: " + commentDto.getBoardId()));
@@ -40,7 +40,6 @@ public class CommentService {
         return convertEntityToDto(savedComment);
     }
 
-    // 게시글 ID로 댓글 조회
     @Transactional(readOnly = true)
     public List<CommentDto> getCommentsByBoardId(Long boardId) {
         return commentRepository.findAllByBoardId(boardId).stream()
@@ -48,7 +47,7 @@ public class CommentService {
                 .collect(Collectors.toList());
     }
 
-    // 댓글 수정
+
     public CommentDto updateComment(Long commentId, CommentDto commentDto, String username) throws IllegalAccessException {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid comment ID: " + commentId));
@@ -65,7 +64,6 @@ public class CommentService {
         return convertEntityToDto(updatedComment);
     }
 
-    // 댓글 삭제
     public void deleteComment(Long commentId, String username) throws IllegalAccessException {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid comment ID: " + commentId));

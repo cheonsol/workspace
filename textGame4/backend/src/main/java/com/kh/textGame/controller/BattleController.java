@@ -18,7 +18,6 @@ public class BattleController {
 
     @PostMapping("/attack")
     public ResponseEntity<BattleResultDto> attack(@RequestBody BattleResultDto request) {
-        // 리액트에서 보낸 플레이어 ID와 몬스터 ID를 받아 서비스를 실행합니다.
         BattleResultDto result = battleService.attack(request.getMonsterId(), request.getMemberId());
         return ResponseEntity.ok(result);
     }

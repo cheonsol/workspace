@@ -17,7 +17,7 @@ public class ItemService {
 
     private final ItemRepository itemRepository;
 
-    // 아이템 생성
+
     public ItemDto createItem(ItemDto itemDto) {
         Item item = Item.builder()
                 .name(itemDto.getName())
@@ -36,7 +36,6 @@ public class ItemService {
         return convertEntityToDto(savedItem);
     }
 
-    // 모든 아이템 조회
     @Transactional(readOnly = true)
     public List<ItemDto> getAllItems() {
         return itemRepository.findAll().stream()
@@ -44,7 +43,6 @@ public class ItemService {
                 .collect(Collectors.toList());
     }
 
-    // 아이템 ID로 조회
     @Transactional(readOnly = true)
     public ItemDto getItemById(Long id) {
         return itemRepository.findById(id)
@@ -52,7 +50,7 @@ public class ItemService {
                 .orElse(null);
     }
 
-    // 아이템 수정
+
     public ItemDto updateItem(Long id, ItemDto itemDto) {
         Item item = itemRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid item Id:" + id));
         
@@ -72,7 +70,7 @@ public class ItemService {
         return convertEntityToDto(updatedItem);
     }
 
-    // 아이템 삭제
+
     public void deleteItem(Long id) {
         itemRepository.deleteById(id);
     }
