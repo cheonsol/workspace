@@ -33,5 +33,22 @@ public class BoardServiceImpl implements BoardService {
     public int delete(Long boardId) {return boardMapper.delete(boardId);}
 
     @Override
-    public int update(Long boardId) {return boardMapper.update(boardId);}
+    public int update(Board board) {
+        return boardMapper.update(board);
+    }
+
+    @Override
+    public int patch(Long boardId, String title, String contents, String fileName) {
+        Board existBoard = boardMapper.findOne(boardId);
+
+        if(existBoard == null) {
+            throw new RuntimeException("board_id가 정상적이지 않습니다.");
+        }
+
+        existBoard.patchUpdate(title, contents, fileName);
+
+        return boardMapper.update(existBoard);
+    }
+
+
 }

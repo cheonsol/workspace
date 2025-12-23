@@ -10,5 +10,6 @@ public interface BoardService {
     int save(Board board);
     Board findOne(Long boardId);
     int delete(Long boardId);
-    int update(Long boardId);
+    int update(Board board);
+    int patch(Long boardId, String title, String contents, String fileName);
 }
