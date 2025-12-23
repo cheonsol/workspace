@@ -1,13 +1,11 @@
 package com.kh.textGame.controller;
 
 import com.kh.textGame.dto.MemberDto;
-import com.kh.textGame.dto.MemberStatUpdateDto;
 import com.kh.textGame.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

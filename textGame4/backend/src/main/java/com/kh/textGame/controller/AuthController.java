@@ -1,6 +1,5 @@
 package com.kh.textGame.controller;
 
-import com.kh.textGame.dto.JwtResponseDto;
 import com.kh.textGame.dto.LoginDto;
 import com.kh.textGame.dto.SignUpDto;
 import com.kh.textGame.service.AuthService;
@@ -33,8 +32,8 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginDto loginDto) {
         try {
-            String token = authService.login(loginDto);
-            return ResponseEntity.ok(new JwtResponseDto(token));
+            authService.login(loginDto);
+            return ResponseEntity.ok("환영합니다.");
         } catch (Exception e) {
             return ResponseEntity.status(401).body("아이디 혹은 비밀번호가 옳지 않습니다.");
         }

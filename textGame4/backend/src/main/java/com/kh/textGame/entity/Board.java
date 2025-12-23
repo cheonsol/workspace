@@ -2,8 +2,11 @@ package com.kh.textGame.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -27,18 +30,20 @@ public class Board {
     @Column(nullable = false)
     private String contents;
 
-    @Column(nullable = false)
-    private String writer;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private Member writer;
+
 
     private String imageUrl;
 
     @Column(nullable = false)
     private boolean isShow = true;
 
-    @CreationTimestamp
+    @CreatedDate
     private LocalDateTime writeDate;
 
-    @UpdateTimestamp
+    @LastModifiedDate
     private LocalDateTime updateDate;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -49,12 +54,11 @@ public class Board {
     }
 
     @Builder
-    public Board(String title, String contents, String writer, String imageUrl) {
+    public Board(String title, String contents, Member writer, String imageUrl) {
         this.title = title;
         this.contents = contents;
         this.writer = writer;
         this.imageUrl = imageUrl;
-        this.isShow = true;
     }
 
     public void update(String title, String contents, String imageUrl) {

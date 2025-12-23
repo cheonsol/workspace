@@ -1,5 +1,7 @@
 package com.kh.textGame.dto;
 
+import com.kh.textGame.entity.Board;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,6 +11,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@Builder
 public class BoardDto {
     private Long id;
 
@@ -25,4 +28,19 @@ public class BoardDto {
     private String imageUrl;
 
     private LocalDateTime writeDate;
+
+    private Boolean isShow;
+
+    public static BoardDto from(Board entity) {
+        return BoardDto.builder()
+                .title(entity.getTitle())
+                .contents(entity.getContents())
+                // 작성자(Member)의 닉네임을 가져오는 로직 등
+                .writer(entity.getWriter() != null ? entity.getWriter().getNickname() : "익명")
+                .imageUrl(entity.getImageUrl())
+                .writeDate(entity.getWriteDate())
+                .isShow(entity.isShow())
+                .build();
+    }
+
 }

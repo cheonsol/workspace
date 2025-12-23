@@ -59,8 +59,4 @@ public class MemberItem {
     public void unequip() {
         this.equipped = false;
     }
-
-    public void toggleEquip() {
-        this.equipped = !this.equipped;
-    }
 }

@@ -13,29 +13,6 @@ public class MemberDto {
     private String userId;
     private String nickname;
 
-    private int level;
-    private long exp;
-    private long gold;
-    private int floor;
-    private int statPoints;
-
-    private int currentHp;
-    private int currentMp;
-
-    private int maxHp;
-    private int maxMp;
-    private int atk;
-    private int def;
-    private int dex;
-    private int luk;
-
-    private int baseMaxHp;
-    private int baseMaxMp;
-    private int baseAtk;
-    private int baseDef;
-    private int baseDex;
-    private int baseLuk;
-
     private List<SkillDto> skills;
     private List<MemberItemDto> inventory;
 

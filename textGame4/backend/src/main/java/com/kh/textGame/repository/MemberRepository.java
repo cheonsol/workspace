@@ -12,11 +12,5 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     boolean existsByNickname(String Nickname);
 
-    @Query("SELECT m FROM Member m " +
-            "LEFT JOIN FETCH m.memberSkills ms " +
-            "LEFT JOIN FETCH ms.skill " +
-            "WHERE m.userId = :userId")
-    Optional<Member> findByUserIdWithSkills(@Param("userId") String userId);
-
-    Optional<Member> findByUserId(String userId);
+    Optional<Member> findByUserId(Long userId);
 }

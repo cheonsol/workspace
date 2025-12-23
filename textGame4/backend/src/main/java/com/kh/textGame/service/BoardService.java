@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -21,14 +20,14 @@ public class BoardService {
     private final MemberRepository memberRepository;
 
 
-    public BoardDto createBoard(BoardDto boardDto, String username) {
-        Member member = memberRepository.findByUserId(username)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid user"));
+    public BoardDto createBoard(BoardDto boardDto, Long userId) {
+        Member member = memberRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("없는 유저입니다."));
 
         Board board = Board.builder()
                 .title(boardDto.getTitle())
                 .contents(boardDto.getContents())
-                .writer(member.getNickname()) // writer 필드에 닉네임 저장
+                .writer(member.getNickname())
                 .imageUrl(boardDto.getImageUrl())
                 .build();
         Board savedBoard = boardRepository.save(board);
@@ -40,25 +39,25 @@ public class BoardService {
     public List<BoardDto> getAllBoards() {
         return boardRepository.findAll().stream()
                 .map(this::convertEntityToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
 
     @Transactional(readOnly = true)
     public BoardDto getBoardById(Long id) {
         return boardRepository.findById(id)
-                .map(this::convertEntityToDto)
+                .map(Board::from)
                 .orElse(null);
     }
     
 
-    public BoardDto updateBoard(Long id, BoardDto boardDto, String username) throws IllegalAccessException {
-        Board board = boardRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid board Id:" + id));
-        Member member = memberRepository.findByUserId(username)
+    public BoardDto updateBoard(Long id, BoardDto boardDto, Long userId) throws IllegalAccessException {
+        Board board = boardRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당하는 게시글이 없습니다."));
+        Member member = memberRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid user"));
 
         if (!board.getWriter().equals(member.getNickname())) {
-            throw new IllegalAccessException("User does not have permission to update this board.");
+            throw new IllegalAccessException("작성자가 아닙니다.");
         }
         
         board.setTitle(boardDto.getTitle());
@@ -68,26 +67,17 @@ public class BoardService {
         return convertEntityToDto(updatedBoard);
     }
 
-
-    public void deleteBoard(Long id, String username) throws IllegalAccessException {
-        Board board = boardRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid board Id:" + id));
-        Member member = memberRepository.findByUserId(username)
+    @Transactional
+    public BoardDto deleteBoard(Long id, Long userId) throws IllegalAccessException {
+        Board board = boardRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당하는 게시글이 없습니다."));
+        Member member = memberRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid user"));
 
         if (!board.getWriter().equals(member.getNickname())) {
-            throw new IllegalAccessException("User does not have permission to delete this board.");
+            throw new IllegalAccessException("작성자가 아닙니다.");
         }
-        boardRepository.deleteById(id);
-    }
-    
-    private BoardDto convertEntityToDto(Board board) {
-        BoardDto boardDto = new BoardDto();
-        boardDto.setId(board.getId());
-        boardDto.setTitle(board.getTitle());
-        boardDto.setContents(board.getContents());
-        boardDto.setWriter(board.getWriter());
-        boardDto.setImageUrl(board.getImageUrl());
-        boardDto.setWriteDate(board.getWriteDate());
-        return boardDto;
+
+        board.setShow(false);
+        return BoardDto.from(board);
     }
 }

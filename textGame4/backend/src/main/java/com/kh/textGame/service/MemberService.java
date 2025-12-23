@@ -1,7 +1,6 @@
 package com.kh.textGame.service;
 
 import com.kh.textGame.dto.MemberDto;
-import com.kh.textGame.dto.MemberStatUpdateDto;
 import com.kh.textGame.dto.SignUpDto;
 import com.kh.textGame.dto.SkillDto;
 import com.kh.textGame.entity.*;
@@ -10,8 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

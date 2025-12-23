@@ -23,22 +23,28 @@ public class Skill {
     private String description;
     private String icon;
 
-    private int damage;
-    private boolean isHealing;
-    private int healAmount;
+    private int value;
+
+    @Enumerated(EnumType.STRING)
+    private skillType type;
 
     private int manaCost;
     private int cooldown;
 
     @Builder
-    public Skill(String name, String description, String icon, int damage, int manaCost, int cooldown, boolean isHealing, int healAmount) {
+    public Skill(String name, String description, String icon, int value, int manaCost, int cooldown) {
         this.name = name;
         this.description = description;
         this.icon = icon;
-        this.damage = damage;
+        this.value = value;
         this.manaCost = manaCost;
         this.cooldown = cooldown;
-        this.isHealing = isHealing;
-        this.healAmount = healAmount;
+    }
+
+    public enum skillType{
+        Damage,
+        Heal,
+        Buff,
+        Debuff
     }
 }
