@@ -17,12 +17,29 @@ const Login = () => {
         setLoginData({ ...loginData, [e.target.name]: e.target.value });
     };
 
-    const handleLogin = (e) => {
-        e.preventDefault();
-        console.log("로그인 시도:", loginData);
-        alert("기록보관소에 접속합니다.");
-        navigate('/'); 
-    };
+    const handleLogin = async (e) => {
+    e.preventDefault();
+
+    try {
+        const response = await fetch('http://localhost:8080/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(loginData),
+        });
+
+        if (response.ok) {
+            const message = await response.text();
+            alert(message);
+            navigate('/');
+        } else {
+            const errorMsg = await response.text();
+            alert(errorMsg);
+        }
+    } catch (error) {
+        console.error("로그인 에러:", error);
+        alert("서버 연결에 실패했습니다.");
+    }
+};
 
     return (
         <LoginContainer>

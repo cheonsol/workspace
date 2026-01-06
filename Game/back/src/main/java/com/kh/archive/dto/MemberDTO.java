@@ -1,4 +1,11 @@
 package com.kh.archive.dto;
 
-public class MemberDto {
+import lombok.Data;
+
+@Data
+public class MemberDTO {
+    private String userId;
+    private String password;
+    private String nickname;
+    private String email;
 }

@@ -16,17 +16,34 @@ const Signup = () => {
         email: ''
     });
 
-    const handleSignup = (e) => {
-        e.preventDefault();
-        console.log("회원가입 데이터:", formData);
-        alert("기록관으로 등록되었습니다!");
-        navigate('/login');
-    };
-
-
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
+
+    const handleSignup = async (e) => {
+    e.preventDefault();
+
+    try {
+        const response = await fetch('http://localhost:8080/api/signup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData), // 리액트의 formData를 JSON으로 변환
+        });
+
+        if (response.ok) {
+            const message = await response.text();
+            alert(message);
+            navigate('/login'); // 성공 시 로그인 페이지로 이동
+        } else {
+            alert("가입 실패: 서버 에러가 발생했습니다.");
+        }
+    } catch (error) {
+        console.error("네트워크 에러:", error);
+        alert("서버와 통신할 수 없습니다.");
+    }
+};
 
     return (
         <>
