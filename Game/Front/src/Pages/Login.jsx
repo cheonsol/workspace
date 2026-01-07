@@ -9,7 +9,7 @@ import {
 const Login = () => {
     const navigate = useNavigate();
     const [loginData, setLoginData] = useState({
-        userId: '',
+        email: '',
         password: ''
     });
 
@@ -17,27 +17,24 @@ const Login = () => {
         setLoginData({ ...loginData, [e.target.name]: e.target.value });
     };
 
-    const handleLogin = async (e) => {
+const handleLogin = async (e) => {
     e.preventDefault();
+    const response = await fetch('http://localhost:8080/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(loginData),
+    });
 
-    try {
-        const response = await fetch('http://localhost:8080/api/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(loginData),
-        });
-
-        if (response.ok) {
-            const message = await response.text();
-            alert(message);
-            navigate('/');
-        } else {
-            const errorMsg = await response.text();
-            alert(errorMsg);
-        }
-    } catch (error) {
-        console.error("로그인 에러:", error);
-        alert("서버 연결에 실패했습니다.");
+    if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('nickname', data.nickname);
+        
+        alert(`${data.nickname}님, 환영합니다!`);
+        navigate('/mypage');
+    }else{
+        const errorMsg = await response.text();
+        alert(errorMsg);
     }
 };
 
@@ -51,10 +48,10 @@ const Login = () => {
                 <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                     <InputGroup>
                         <StyledInput 
-                            name="userId"
-                            value={loginData.userId}
+                            name="email"
+                            value={loginData.email}
                             onChange={handleChange}
-                            placeholder="USER ID"
+                            placeholder="EMAIL"
                             required
                         />
                         <StyledInput 

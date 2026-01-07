@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Navbar from '../assets/Navbar';
 import MainIllust from '../assets/MainIllust.png';
 import { 
     SignupContainer, BackgroundImage, FormBox, Title, 
@@ -10,10 +11,10 @@ const Signup = () => {
     const navigate = useNavigate();
     
     const [formData, setFormData] = useState({
-        userId: '',
+        email: '',         // ID 대신 email 사용
         password: '',
-        nickname: '',
-        email: ''
+        confirmPassword: '', // 비밀번호 확인 필드 추가
+        nickname: ''
     });
 
     const handleChange = (e) => {
@@ -21,29 +22,41 @@ const Signup = () => {
     };
 
     const handleSignup = async (e) => {
-    e.preventDefault();
+        e.preventDefault();
 
-    try {
-        const response = await fetch('http://localhost:8080/api/signup', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData), // 리액트의 formData를 JSON으로 변환
-        });
-
-        if (response.ok) {
-            const message = await response.text();
-            alert(message);
-            navigate('/login'); // 성공 시 로그인 페이지로 이동
-        } else {
-            alert("가입 실패: 서버 에러가 발생했습니다.");
+        // 유효성 검사
+        if (formData.password !== formData.confirmPassword) {
+            alert("비밀번호가 일치하지 않습니다.");
+            return;
         }
-    } catch (error) {
-        console.error("네트워크 에러:", error);
-        alert("서버와 통신할 수 없습니다.");
-    }
-};
+
+        if (!formData.email.includes('@')) {
+            alert("올바른 이메일 형식이 아닙니다.");
+            return;
+        }
+
+        try {
+            // 백엔드 전송 시에는 confirmPassword를 제외하고 전송하는 것이 좋습니다.
+            const { confirmPassword, ...submitData } = formData;
+
+            const response = await fetch('http://localhost:8080/api/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(submitData),
+            });
+
+            if (response.ok) {
+                const message = await response.text();
+                alert(message);
+                navigate('/login');
+            } else {
+                const errorMsg = await response.text();
+                alert(errorMsg);
+            }
+        } catch (error) {
+            alert("서버 연결에 실패했습니다.");
+        }
+    };
 
     return (
         <>
@@ -53,12 +66,13 @@ const Signup = () => {
                     <Title>NEW ARCHIVIST</Title>
                     
                     <InputGroup>
-                        <Label>ID (ACCOUNT)</Label>
+                        <Label>EMAIL (ID)</Label>
                         <StyledInput 
-                            name="userId"
-                            value={formData.userId}
+                            name="email"
+                            type="email"
+                            value={formData.email}
                             onChange={handleChange}
-                            placeholder="아이디를 입력하세요"
+                            placeholder="이메일을 입력하세요"
                         />
                     </InputGroup>
 
@@ -74,6 +88,17 @@ const Signup = () => {
                     </InputGroup>
 
                     <InputGroup>
+                        <Label>CONFIRM PASSWORD</Label>
+                        <StyledInput 
+                            type="password"
+                            name="confirmPassword"
+                            value={formData.confirmPassword}
+                            onChange={handleChange}
+                            placeholder="비밀번호를 다시 입력하세요"
+                        />
+                    </InputGroup>
+
+                    <InputGroup>
                         <Label>NICKNAME</Label>
                         <StyledInput 
                             name="nickname"
@@ -83,27 +108,11 @@ const Signup = () => {
                         />
                     </InputGroup>
 
-                    <InputGroup>
-                        <Label>EMAIL</Label>
-                        <StyledInput 
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            placeholder="이메일을 입력하세요"
-                        />
-                    </InputGroup>
-
                     <ButtonGroup>
-                        <ActionButton 
-                            primary 
-                            onClick={handleSignup}
-                        >
+                        <ActionButton primary onClick={handleSignup}>
                             CREATE ACCOUNT
                         </ActionButton>
-                        <ActionButton 
-                            type="button"
-                            onClick={() => navigate('/')}
-                        >
+                        <ActionButton type="button" onClick={() => navigate('/')}>
                             CANCEL
                         </ActionButton>
                     </ButtonGroup>

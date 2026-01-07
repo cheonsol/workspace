@@ -1,8 +1,8 @@
 package com.kh.archive.entity;
-
+import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -10,21 +10,19 @@ import java.time.LocalDateTime;
 @Table(name = "members")
 @Getter
 @Setter
-@NoArgsConstructor
 public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true, nullable = false)
-    private String userId;
+    private String email;
 
     @Column(nullable = false)
     private String password;
 
     private String nickname;
-    private String email;
 
-    @CreationTimestamp // 가입 시간 자동 생성
+    @CreationTimestamp
     private LocalDateTime regDate;
 }

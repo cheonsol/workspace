@@ -1,6 +1,6 @@
 package com.kh.archive.service;
 
-import com.kh.archive.Repasitory.MemberRepository;
+import com.kh.archive.repository.MemberRepository;
 import com.kh.archive.dto.MemberDTO;
 import com.kh.archive.entity.Member;
 import lombok.RequiredArgsConstructor;
@@ -16,27 +16,27 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional
     public void register(MemberDTO memberDTO) {
-        if (memberRepository.existsByUserId(memberDTO.getUserId())) {
-            throw new IllegalStateException("이미 존재하는 아이디입니다.");
-        }
-
-        if (memberDTO.getPassword().length() < 4) {
-            throw new IllegalArgumentException("비밀번호는 4자 이상이어야 합니다.");
+        if (memberRepository.existsByEmail(memberDTO.getEmail())) {
+            throw new IllegalStateException("이미 존재하는 이메일입니다.");
         }
 
         Member member = new Member();
-        member.setUserId(memberDTO.getUserId());
+        member.setEmail(memberDTO.getEmail());
         member.setPassword(memberDTO.getPassword());
         member.setNickname(memberDTO.getNickname());
-        member.setEmail(memberDTO.getEmail());
-
         memberRepository.save(member);
     }
 
     @Override
-    public Member login(String userId, String password) {
-        return memberRepository.findByUserId(userId)
+    public Member login(String email, String password) {
+        return memberRepository.findByEmail(email)
                 .filter(m -> m.getPassword().equals(password))
-                .orElseThrow(() -> new IllegalArgumentException("아이디 또는 비밀번호가 일치하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("이메일 또는 비밀번호가 일치하지 않습니다."));
+    }
+
+    @Override
+    public Member findByEmail(String email) {
+        return memberRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
     }
 }
