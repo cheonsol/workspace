@@ -1,17 +1,15 @@
 import styled from 'styled-components';
 
-
 export const MainContainer = styled.div`
     position: relative;
-    width: 100%;
+    width: 100vw;
     height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #121212;
+    background-color: #f0f9ff;
     overflow: hidden;
 `;
-
 
 export const HeroImage = styled.img`
     position: absolute;
@@ -21,35 +19,44 @@ export const HeroImage = styled.img`
     height: 100%;
     object-fit: cover;
     z-index: 0;
-    filter: brightness(0.7); 
 `;
 
 export const BottomLeftGroup = styled.div`
     position: absolute;
-    left: 50px;
-    bottom: 50px;
+    left: 60px;
+    bottom: 60px;
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    z-index: 10; 
+    gap: 20px;
+    z-index: 10;
 `;
 
-
 export const GameButton = styled.div`
- 
-    width: 250px;
-    padding: 12px 20px;
-    font-size: 1.2rem;
-    font-family: 'Courier New', Courier, monospace;
+    width: 280px;
+    padding: 16px 30px;
+    font-size: 1.5rem;
+    font-weight: 900;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.15s ease-in-out;
+    border-radius: 60px;
+    border: 4px solid #8b4513;
     
-    background-color: ${props => props.isActive ? '#d4af37' : 'rgba(26, 26, 26, 0.8)'};
-    color: ${props => props.isActive ? '#1a1a1a' : '#d4af37'};
-    border: 1px solid #d4af37;
-    transform: ${props => props.isActive ? 'translateX(20px)' : 'translateX(0)'};
+    background-color: ${props => props.isActive ? '#ffeb3b' : '#ffde59'};
+    color: #8b4513;
+    box-shadow: ${props => props.isActive ? '0 3px 0 #d97706' : '0 8px 0 #d97706'};
+    transform: ${props => props.isActive ? 'translateY(5px) translateX(25px)' : 'translateX(0)'};
     
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
     &::before {
-        content: '${props => props.isActive ? '▶ ' : ''}';
+        content: '${props => props.isActive ? '🥝 ' : ''}';
+        margin-right: 10px;
+    }
+
+    &:hover {
+        background-color: #ffeb3b;
+        transform: ${props => props.isActive ? 'translateY(5px) translateX(25px)' : 'translateY(-3px)'};
     }
 `;

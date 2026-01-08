@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../assets/Navbar';
-import MainIllust from '../assets/MainIllust.png';
+import KiwiMain from '../assets/KiwiMain.png';
 import { 
     SignupContainer, BackgroundImage, FormBox, Title, 
     InputGroup, Label, StyledInput, ButtonGroup, ActionButton 
@@ -11,9 +11,9 @@ const Signup = () => {
     const navigate = useNavigate();
     
     const [formData, setFormData] = useState({
-        email: '',         // ID 대신 email 사용
+        email: '',      
         password: '',
-        confirmPassword: '', // 비밀번호 확인 필드 추가
+        confirmPassword: '', 
         nickname: ''
     });
 
@@ -24,7 +24,6 @@ const Signup = () => {
     const handleSignup = async (e) => {
         e.preventDefault();
 
-        // 유효성 검사
         if (formData.password !== formData.confirmPassword) {
             alert("비밀번호가 일치하지 않습니다.");
             return;
@@ -36,7 +35,6 @@ const Signup = () => {
         }
 
         try {
-            // 백엔드 전송 시에는 confirmPassword를 제외하고 전송하는 것이 좋습니다.
             const { confirmPassword, ...submitData } = formData;
 
             const response = await fetch('http://localhost:8080/api/signup', {
@@ -61,7 +59,7 @@ const Signup = () => {
     return (
         <>
             <SignupContainer>
-                <BackgroundImage src={MainIllust} alt="background" />
+                <BackgroundImage src={KiwiMain} alt="background" />
                 <FormBox>
                     <Title>NEW ARCHIVIST</Title>
                     

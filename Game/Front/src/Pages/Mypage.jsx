@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../assets/Navbar';
-import MainIllust from '../assets/MainIllust.png';
+import KiwiMain from '../assets/KiwiMain.png';
 import { 
     MypageContainer, BackgroundImage, ProfileCard, ProfileTitle, 
     InfoSection, InfoRow, Label, Value, ButtonGroup, MenuButton 
@@ -12,78 +11,68 @@ const Mypage = () => {
     const [user, setUser] = useState({
         email: 'loading...',
         nickname: 'loading...',
-        regDate: 'loading...'
+        highScore: 0
     });
 
-    const formatDate = (dateString) => {
-    if (!dateString || dateString === 'loading...') return dateString;
-    
-    const date = new Date(dateString);
-    
-    return new Intl.DateTimeFormat('ko-KR', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-    }).format(date);
-};
-
-useEffect(() => {
-    const fetchMyInfo = async () => {
-        const token = localStorage.getItem('token');
-        
-        if (!token) {
-            alert("로그인이 필요합니다.");
-            navigate('/login');
-            return;
-        }
-
-        const response = await fetch('http://localhost:8080/api/member/me', {
-            headers: {
-                'Authorization': `Bearer ${token}`
+    useEffect(() => {
+        const fetchMyInfo = async () => {
+            const token = localStorage.getItem('token');
+            
+            if (!token) {
+                alert("로그인이 필요합니다.");
+                navigate('/login');
+                return;
             }
-        });
 
-        if (response.ok) {
-            const data = await response.json();
-            setUser(data);
-        }
-    };
-    fetchMyInfo();
-}, []);
+            try {
+                const response = await fetch('http://localhost:8080/api/member/me', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setUser(data);
+                }
+            } catch (error) {
+                console.error("데이터 로딩 실패:", error);
+            }
+        };
+        fetchMyInfo();
+    }, [navigate]);
 
     return (
-        <>
-            <MypageContainer>
-                <BackgroundImage src={MainIllust} alt="background" />
-                <ProfileCard>
-                    <ProfileTitle>ARCHIVIST PROFILE</ProfileTitle>
-                    
-                    <InfoSection>
-                        <InfoRow>
-                            <Label>ID (EMAIL)</Label>
-                            <Value>{user.email}</Value>
-                        </InfoRow>
-                        <InfoRow>
-                            <Label>NICKNAME</Label>
-                            <Value>{user.nickname}</Value>
-                        </InfoRow>
-                        <InfoRow>
-                            <Label>REGISTRATION DATE</Label>
-                            <Value>{user.regDate}</Value>
-                        </InfoRow>
-                    </InfoSection>
+        <MypageContainer>
+            <BackgroundImage src={KiwiMain} alt="background" />
+            <ProfileCard>
+                <ProfileTitle>ARCHIVIST PROFILE</ProfileTitle>
+                
+                <InfoSection>
+                    <InfoRow>
+                        <Label>ID (EMAIL)</Label>
+                        <Value>{user.email}</Value>
+                    </InfoRow>
+                    <InfoRow>
+                        <Label>NICKNAME</Label>
+                        <Value>{user.nickname}</Value>
+                    </InfoRow>
+                    <InfoRow>
+                        <Label>HIGHEST SCORE</Label>
+                        <Value>{user.highScore.toLocaleString()}</Value>
+                    </InfoRow>
+                </InfoSection>
 
-                    <ButtonGroup>
-                        <MenuButton onClick={() => navigate('/edit-profile')}>
-                            EDIT PROFILE
-                        </MenuButton>
-                        <MenuButton exit onClick={() => navigate('/')}>
-                            BACK TO TITLE
-                        </MenuButton>
-                    </ButtonGroup>
-                </ProfileCard>
-            </MypageContainer>
-        </>
+                <ButtonGroup>
+                    <MenuButton onClick={() => navigate('/edit-profile')}>
+                        EDIT PROFILE
+                    </MenuButton>
+                    <MenuButton exit onClick={() => navigate('/')}>
+                        BACK TO TITLE
+                    </MenuButton>
+                </ButtonGroup>
+            </ProfileCard>
+        </MypageContainer>
     );
 };
 

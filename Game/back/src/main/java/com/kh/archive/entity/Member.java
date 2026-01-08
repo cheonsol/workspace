@@ -23,6 +23,12 @@ public class Member {
 
     private String nickname;
 
-    @CreationTimestamp
-    private LocalDateTime regDate;
+    @Column(name = "high_score")
+    private int highScore = 0;
+
+    public void updateHighScore(int newScore) {
+        if (newScore > this.highScore) {
+            this.highScore = newScore;
+        }
+    }
 }

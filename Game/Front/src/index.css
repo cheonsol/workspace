@@ -1,60 +1,98 @@
 :root {
   font-family: 'Pretendard', system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
+  line-height: 1.6;
   font-weight: 400;
-
-  color: #e0e0e0;
-  background-color: #121212; 
-
+  color: #4a3728;
+  background-color: #f0f9ff;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-smoothing: grayscale;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
-  display: block; 
-  min-width: 320px;
-  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: linear-gradient(to bottom, #e0f2fe 0%, #f0fdf4 100%);
 }
 
 #root {
   width: 100%;
-  margin: 0;
-  padding: 0;
+  max-width: 1200px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  padding: 1rem;
+  text-align: center;
 }
 
 a {
-  font-weight: 500;
-  color: #d4af37;
-  text-decoration: inherit;
+  font-weight: 700;
+  color: #22c55e;
+  text-decoration: none;
   transition: 0.3s;
 }
+
 a:hover {
-  color: #fff;
+  color: #15803d;
+  text-decoration: underline;
 }
 
 h1 {
-  font-size: 2.5em;
-  line-height: 1.1;
-  color: #d4af37;
+  font-size: clamp(1.5rem, 8vw, 3.2rem);
+  line-height: 1.2;
+  color: #8b4513;
+  text-shadow: 2px 2px 0px #fff;
+  margin-bottom: 0.5rem;
 }
 
 button {
-  border-radius: 4px;
-  border: 1px solid #d4af37;
-  padding: 0.8em 1.5em;
-  font-size: 1em;
-  font-weight: 600;
+  border-radius: 50px;
+  border: 3px solid #8b4513;
+  padding: 0.8em 2em;
+  font-size: 1.1em;
+  font-weight: 800;
   font-family: inherit;
-  background-color: #1a1a1a;
-  color: #d4af37;
+  background-color: #ffde59;
+  color: #8b4513;
   cursor: pointer;
-  transition: all 0.25s;
+  box-shadow: 0 4px 0 #d97706;
+  transition: all 0.1s;
+  margin: 5px;
 }
 
+button:hover {
+  background-color: #ffeb3b;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 #d97706;
+}
 
 button:active {
-  transform: scale(0.98);
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #d97706;
+}
+
+.game-container {
+  width: 100%;
+  max-width: 800px;
+  aspect-ratio: 16 / 9;
+  border: 5px solid #8b4513;
+  border-radius: 20px;
+  background-color: white;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  margin-top: 10px;
+  position: relative;
 }

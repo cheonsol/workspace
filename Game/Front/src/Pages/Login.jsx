@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import MainIllust from '../assets/MainIllust.png';
+import KiwiMain from '../assets/KiwiMain.png';
 import { 
     LoginContainer, BackgroundImage, LoginBox, Title, 
     InputGroup, StyledInput, ButtonGroup, LoginButton, SubButton 
@@ -40,7 +40,7 @@ const handleLogin = async (e) => {
 
     return (
         <LoginContainer>
-            <BackgroundImage src={MainIllust} alt="background" />
+            <BackgroundImage src={KiwiMain} alt="background" />
             
             <LoginBox>
                 <Title>ENTER ARCHIVE</Title>

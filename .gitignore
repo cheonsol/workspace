@@ -272,3 +272,11 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/windows,eclipse,node,react,java
+
+# Vite 캐시
+.vite/
+node_modules/
+
+# H2 데이터베이스 임시 파일
+*.db
+*.lock.db
