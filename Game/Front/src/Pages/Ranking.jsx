@@ -40,7 +40,7 @@ const RankingPage = () => {
                                 <RankNumber index={index}>{index + 1}</RankNumber>
                                 <Nickname>{rank.nickname}</Nickname>
                             </RankInfo>
-                            <ScoreValue>{rank.score.toLocaleString()} PTS</ScoreValue>
+                            <ScoreValue>{rank.score.toLocaleString()}</ScoreValue>
                         </RankRow>
                     )) : (
                         <p style={{ textAlign: 'center', color: '#8b4513', fontWeight: 'bold' }}>

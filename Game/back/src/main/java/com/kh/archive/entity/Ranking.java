@@ -4,14 +4,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
-@Getter
-@Setter
+@Getter @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Ranking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,9 +18,5 @@ public class Ranking {
 
     private String nickname;
     private int score;
-
-    public Ranking(String nickname, int score) {
-        this.nickname = nickname;
-        this.score = score;
-    }
+    private String guestId;
 }

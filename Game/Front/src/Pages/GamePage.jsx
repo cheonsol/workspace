@@ -1,122 +1,231 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GameContainer, CanvasWrapper, ScoreBoard, Overlay } from './GamePage.style';
+import kiwiRunSrc from '../assets/player/kiwi_run.png'; 
 
 const GamePage = () => {
     const canvasRef = useRef(null);
     const navigate = useNavigate();
-    const [score, setScore] = useState(0);
-    // 진입하자마자 게임이 시작되도록 초기값을 'PLAYING'으로 설정
+    const scoreRef = useRef(0);
+    const [displayScore, setDisplayScore] = useState(0);
     const [gameState, setGameState] = useState('PLAYING');
+    const [bestScore, setBestScore] = useState(0);
 
-    const saveScore = async (finalScore) => {
-        const currentScore = Math.floor(finalScore / 10);
-        
-        const bestScore = localStorage.getItem('highScore') || 0;
-        if (currentScore > bestScore) {
-            localStorage.setItem('highScore', currentScore);
+    useEffect(() => {
+        let guestId = localStorage.getItem('guestId');
+        if (!guestId) {
+            guestId = crypto.randomUUID(); 
+            localStorage.setItem('guestId', guestId);
         }
+        fetch(`http://localhost:8080/api/ranking/my-best/${guestId}`)
+            .then(res => res.json())
+            .then(data => setBestScore(data))
+            .catch(err => console.error(err));
+    }, []);
 
+    const handleSubmit = async () => {
+        const nickname = document.getElementById('nicknameInput')?.value || '익명의 키위';
+        const guestId = localStorage.getItem('guestId');
         try {
-            await fetch('http://localhost:8080/api/ranking', {
+            const response = await fetch('http://localhost:8080/api/ranking', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    nickname: '익명의 키위',
-                    score: currentScore 
-                })
+                body: JSON.stringify({ nickname, score: scoreRef.current, guestId })
             });
+            if (response.ok) navigate('/ranking');
         } catch (error) {
-            console.error("점수 전송 실패");
+            console.error(error);
         }
     };
-
+    
     useEffect(() => {
         if (gameState !== 'PLAYING') return;
 
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
+        window.focus(); 
+
         let animationId;
         let frameCount = 0;
         let gameSpeed = 5;
-        let currentScore = 0;
         let obstacles = [];
 
-        const kiwi = {
-            x: 100,
-            y: 300,
-            width: 50,
-            height: 50,
-            velocityY: 0,
-            jumpPower: -12,
-            gravity: 0.6,
-            isJumping: false,
-            draw() {
-                ctx.fillStyle = '#8b4513';
-                ctx.fillRect(this.x, this.y, this.width, this.height);
-            },
-            update() {
-                this.velocityY += this.gravity;
-                this.y += this.velocityY;
-                if (this.y + this.height > 350) {
-                    this.y = 350 - this.height;
-                    this.isJumping = false;
-                }
-                this.draw();
-            }
+        const kiwiImg = new Image();
+        kiwiImg.src = kiwiRunSrc;
+
+        const IMAGE_WIDTH = 500;
+        const IMAGE_HEIGHT = 500;
+        const MAX_COLS = 5;
+        const ROWS = 3;
+        const FRAME_WIDTH = 100;
+        const FRAME_HEIGHT = 166.6;
+
+        const SPRITE = {
+            RUN:  { row: 0, frames: 5, speed: 6 }, 
+            JUMP: { row: 1, frames: 3, speed: 8 }, 
+            FALL: { row: 2, frames: 2, speed: 10 }
         };
 
-        const handleKeyDown = (e) => {
-            if (e.code === 'Space' && !kiwi.isJumping) {
-                kiwi.velocityY = kiwi.jumpPower;
-                kiwi.isJumping = true;
+        const groundY = 350;
+        
+        const kiwi = {
+            x: 100,
+            y: 0,
+            width: 80,
+            height: 80,
+            footOffset: 22,
+            velocityY: 0,
+            jumpPower: -16, // 점프 힘
+            gravity: 0.8,   
+            isJumping: false,
+            jumpDelayTimer: 0, 
+            state: 'RUN',
+            frameIndex: 0,
+            frameTimer: 0,
+
+            // kiwi 객체의 update 함수 부분만 아래와 같이 교체해 보세요.
+
+update() {
+    const groundPos = groundY - this.height + this.footOffset;
+    if (this.y === 0) this.y = groundPos;
+
+    // 1. 점프 딜레이 (땅에서 기 모으기)
+    if (this.jumpDelayTimer > 0) {
+        this.jumpDelayTimer--;
+        this.state = 'JUMP';
+        this.frameIndex = 0; // 무조건 웅크린 자세 고정
+        
+        if (this.jumpDelayTimer === 0) {
+            this.velocityY = this.jumpPower; 
+            this.y += this.velocityY; // 즉시 위치 이동으로 바닥 탈출
+            this.frameIndex = 1; // 도약 자세로 변경
+        }
+        this.draw();
+        return; // 딜레이 중에는 아래 로직 실행 안 함
+    }
+
+    // 2. 물리 엔진 적용 (공중 상태)
+    if (this.y < groundPos || this.velocityY !== 0) {
+        this.velocityY += this.gravity;
+        this.y += this.velocityY;
+    }
+
+    // 3. 상태 및 애니메이션 결정 (우선순위 중요)
+    if (this.y >= groundPos) {
+        // [바닥 상태]
+        this.y = groundPos;
+        this.velocityY = 0;
+        if (this.isJumping) {
+            this.isJumping = false;
+            this.state = 'RUN';
+            this.frameIndex = 0;
+            this.frameTimer = 0;
+        }
+    } else {
+        // [공중 상태]
+        if (this.velocityY < -2) { 
+            // 확실히 상승 중일 때 (수치 조정 가능)
+            this.state = 'JUMP';
+            this.frameIndex = 1; 
+        } else if (this.velocityY >= -2 && this.velocityY <= 2) {
+            // 점프 정점 (Apex)
+            this.state = 'JUMP';
+            this.frameIndex = 2; // 만약 점프 행에 3번째 프레임이 있다면 사용
+        } else {
+            // 하강 중
+            this.state = 'FALL';
+        }
+    }
+
+    // 4. 자동 애니메이션 (RUN과 FALL 상태에서만 프레임 순환)
+    if (this.state === 'RUN' || this.state === 'FALL') {
+        const sprite = SPRITE[this.state];
+        this.frameTimer += (gameSpeed / 5);
+        if (this.frameTimer >= sprite.speed) {
+            this.frameIndex = (this.frameIndex + 1) % sprite.frames;
+            this.frameTimer = 0;
+        }
+    }
+    
+    this.draw();
+},
+
+            draw() {
+                const sprite = SPRITE[this.state];
+                const sourceX = this.frameIndex * FRAME_WIDTH;
+                const sourceY = Math.floor(sprite.row * FRAME_HEIGHT);
+
+                ctx.imageSmoothingEnabled = false;
+                ctx.drawImage(
+                    kiwiImg,
+                    sourceX, sourceY, FRAME_WIDTH, Math.floor(FRAME_HEIGHT),
+                    this.x, this.y, this.width, this.height
+                );
             }
         };
 
         const animate = () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // 바닥 그리기
             ctx.fillStyle = '#90EE90';
-            ctx.fillRect(0, 350, canvas.width, 50);
+            ctx.fillRect(0, groundY, canvas.width, 50);
 
             kiwi.update();
+            kiwi.draw();
 
             frameCount++;
-            if (frameCount % 100 === 0) {
-                obstacles.push({
-                    x: canvas.width,
-                    y: 310,
-                    width: 40,
-                    height: 40
-                });
+            if (frameCount % 120 === 0) {
+                obstacles.push({ x: canvas.width, y: 310, width: 60, height: 40 });
             }
 
-            obstacles.forEach((obs) => {
+            for (let i = 0; i < obstacles.length; i++) {
+                const obs = obstacles[i];
                 obs.x -= gameSpeed;
-                ctx.fillStyle = '#5d4037';
+                ctx.fillStyle = '#8B4513';
                 ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
 
-                if (kiwi.x < obs.x + obs.width &&
-                    kiwi.x + kiwi.width > obs.x &&
-                    kiwi.y < obs.y + obs.height &&
-                    kiwi.y + kiwi.height > obs.y) {
+                const kHitbox = {
+                    x: kiwi.x + 25,
+                    y: kiwi.y + 20,
+                    w: kiwi.width - 50,
+                    h: kiwi.height - 30
+                };
+
+                if (
+                    kHitbox.x < obs.x + obs.width &&
+                    kHitbox.x + kHitbox.w > obs.x &&
+                    kHitbox.y < obs.y + obs.height &&
+                    kHitbox.y + kHitbox.h > obs.y
+                ) {
                     setGameState('GAMEOVER');
-                    saveScore(currentScore);
                     cancelAnimationFrame(animationId);
+                    return; 
                 }
-            });
+            }
 
             obstacles = obstacles.filter(obs => obs.x + obs.width > 0);
-            currentScore++;
-            setScore(Math.floor(currentScore / 10));
+            scoreRef.current += 1;
+            if (frameCount % 10 === 0) {
+                setDisplayScore(Math.floor(scoreRef.current / 10));
+            }
+
             gameSpeed += 0.001;
             animationId = requestAnimationFrame(animate);
         };
 
-        window.addEventListener('keydown', handleKeyDown);
-        animate();
+        kiwiImg.onload = () => animate();
 
+        const handleKeyDown = (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault(); 
+                // 점프 중이 아닐 때만 점프 시작
+                if (!kiwi.isJumping && kiwi.jumpDelayTimer === 0 && gameState === 'PLAYING') {
+                    kiwi.isJumping = true;
+                    kiwi.jumpDelayTimer = 10; // 10프레임 동안 땅에서 대기 (딜레이 상향)
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
             cancelAnimationFrame(animationId);
@@ -125,39 +234,17 @@ const GamePage = () => {
 
     return (
         <GameContainer>
-            <ScoreBoard>SCORE: {score} PTS</ScoreBoard>
+            <ScoreBoard>SCORE: {displayScore} | BEST: {bestScore}</ScoreBoard>
             <CanvasWrapper>
                 <canvas ref={canvasRef} width={800} height={400} />
             </CanvasWrapper>
-
             {gameState === 'GAMEOVER' && (
                 <Overlay>
-                    <h1 style={{color: '#8b4513'}}>GAME OVER</h1>
-                    <p style={{fontSize: '1.5rem', fontWeight: 'bold'}}>SCORE: {score} PTS</p>
-                    
-                    <input 
-                        type="text" 
-                        placeholder="닉네임을 입력하세요"
-                        id="nicknameInput"
-                        style={{padding: '10px', borderRadius: '10px', border: '2px solid #8b4513', marginBottom: '10px'}}
-                    />
-
-                    <button onClick={async () => {
-                        const nickname = document.getElementById('nicknameInput').value || '익명의 키위';
-                        await fetch('http://localhost:8080/api/ranking', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ nickname, score })
-                        });
-                        navigate('/ranking');
-                    }}>
-                        SCORE SUBMIT
-                    </button>
-                    <button onClick={() => {
-                        setScore(0);
-                        setGameState('PLAYING');
-                    }}>RETRY</button>
-                    <button onClick={() => navigate('/')}>TITLE</button>
+                    <h1>GAME OVER</h1>
+                    <p>SCORE: {displayScore}</p>
+                    <input id="nicknameInput" type="text" placeholder="닉네임 입력" />
+                    <button onClick={handleSubmit}>SCORE SUBMIT</button>
+                    <button onClick={() => window.location.reload()}>RETRY</button>
                 </Overlay>
             )}
         </GameContainer>

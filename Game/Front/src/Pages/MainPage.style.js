@@ -60,3 +60,29 @@ export const GameButton = styled.div`
         transform: ${props => props.isActive ? 'translateY(5px) translateX(25px)' : 'translateY(-3px)'};
     }
 `;
+
+export const BestScoreBadge = styled.div`
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    background-color: #8b4513;
+    color: #ffde59;
+    padding: 15px 25px;
+    border: 4px solid #ffde59;
+    border-radius: 15px;
+    box-shadow: 0 5px 0 #5d4037;
+    text-align: center;
+    font-weight: 900;
+    z-index: 20;
+
+    small {
+        display: block;
+        font-size: 0.8rem;
+        margin-bottom: 5px;
+        color: #fff;
+    }
+
+    div {
+        font-size: 1.5rem;
+    }
+`;
