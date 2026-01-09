@@ -1,6 +1,6 @@
 #FileLock
-#Fri Jan 09 02:55:41 KST 2026
-server=10.162.107.195\:54917
-hostName=sihoe
+#Fri Jan 09 09:18:48 KST 2026
+server=192.168.10.23\:58203
+hostName=DESKTOP-HLU6KVU
 method=file
-id=19b9ebffde063bf397f58b51c213597d54b2244fd3b
+id=19ba01eb71afa1f0d5cb028216df54eacf2f920e696

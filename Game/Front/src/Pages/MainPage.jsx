@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MainContainer, HeroImage, BottomLeftGroup, GameButton, BestScoreBadge } from './MainPage.style';
+import { MainContainer, HeroImage, BottomLeftGroup, GameButton, BestScoreBadge, LogoContainer, LogoTitle, LogoKiwi, LogoSubtitle } from './MainPage.style';
 import KiwiMain from '../assets/KiwiMain.png';
 
 const MainPage = () => {
@@ -29,6 +29,14 @@ useEffect(() => {
 
     return (
         <MainContainer>
+            <LogoContainer>
+                <LogoTitle>
+                    <LogoKiwi>🥝</LogoKiwi>
+                    KIWI RUN
+                </LogoTitle>
+                <LogoSubtitle>Jump & Survive!</LogoSubtitle>
+            </LogoContainer>
+            
             <BestScoreBadge>
                 <small>MY BEST</small>
                 <div>{bestScore.toLocaleString()}</div>
